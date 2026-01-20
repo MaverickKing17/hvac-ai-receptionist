@@ -18,7 +18,8 @@ import {
   ArrowTrendingUpIcon,
   UserCircleIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  PaperAirplaneIcon
 } from '@heroicons/react/24/solid';
 
 // --- Helper Functions for Audio Processing ---
@@ -80,22 +81,24 @@ const HeroAnimation: React.FC<{ isActive: boolean }> = ({ isActive }) => {
       </div>
 
       <div className="relative z-20 group">
-        <div className={`absolute -inset-8 bg-blue-500/20 blur-3xl rounded-full transition-all duration-700 ${isActive ? 'opacity-100 scale-125' : 'opacity-0'}`}></div>
-        <div className="relative w-40 h-40 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl flex items-center justify-center border border-white/50 dark:border-slate-800 animate-float">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/10 to-orange-500/10 rounded-[2.5rem]"></div>
-          <div className="relative flex flex-col items-center gap-2">
-            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500 ${isActive ? 'bg-orange-500 shadow-orange-500/40' : 'bg-blue-700 shadow-blue-500/40'}`}>
-              <MicrophoneIcon className="w-8 h-8 text-white" />
+        <div className={`absolute -inset-12 bg-blue-500/30 blur-[100px] rounded-full transition-all duration-700 ${isActive ? 'opacity-100 scale-150' : 'opacity-0'}`}></div>
+        <div className="relative w-48 h-48 bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl flex items-center justify-center border border-white/50 dark:border-slate-800 animate-float ring-1 ring-white/10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/20 to-orange-500/20 rounded-[3rem]"></div>
+          <div className="relative flex flex-col items-center gap-4">
+            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl transition-all duration-500 ${isActive ? 'bg-orange-600 scale-110 shadow-orange-500/50' : 'bg-blue-700 shadow-blue-500/40'}`}>
+              <MicrophoneIcon className="w-10 h-10 text-white" />
             </div>
-            <span className="text-xs font-black tracking-tighter text-blue-700 dark:text-blue-400">MELISSA AI</span>
-            <div className="flex gap-1 items-center h-4">
-              {[0, 1, 2, 3].map((i) => (
-                <div 
-                  key={i} 
-                  className={`w-1 bg-blue-500 rounded-full transition-all duration-300 ${isActive ? 'animate-waveform' : 'h-1'}`} 
-                  style={{ animationDelay: `${i * 0.15}s` }}
-                ></div>
-              ))}
+            <div className="flex flex-col items-center">
+              <span className="text-[10px] font-black tracking-[0.3em] text-blue-700 dark:text-blue-400 uppercase mb-1">Melissa AI</span>
+              <div className="flex gap-1.5 items-center h-6">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div 
+                    key={i} 
+                    className={`w-1 bg-blue-500 rounded-full transition-all duration-300 ${isActive ? 'animate-waveform' : 'h-1.5 opacity-30'}`} 
+                    style={{ animationDelay: `${i * 0.1}s`, height: isActive ? 'auto' : '6px' }}
+                  ></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -111,6 +114,128 @@ const HeroAnimation: React.FC<{ isActive: boolean }> = ({ isActive }) => {
           <CalendarIcon className="w-6 h-6 text-blue-600" />
         </div>
       </div>
+    </div>
+  );
+};
+
+const LiveChatWidget: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string }[]>([
+    { role: 'model', text: 'Hi! I\'m Melissa, your AI HVAC assistant. How can I help you book a call or calculate your rebates today?' }
+  ]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatSessionRef = useRef<any>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const startChat = () => {
+    if (!chatSessionRef.current) {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      chatSessionRef.current = ai.chats.create({
+        model: 'gemini-3-flash-preview',
+        config: {
+          systemInstruction: 'You are Melissa, the AI Live Chat agent for Peel AI Systems. Your goal is to help HVAC contractors understand how AI can help their business by booking calls, qualifying leads, and calculating Ontario HVAC rebates. Be professional, friendly, and brief.'
+        }
+      });
+    }
+  };
+
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!inputValue.trim()) return;
+
+    const userMessage = inputValue;
+    setInputValue('');
+    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setIsTyping(true);
+
+    try {
+      startChat();
+      const stream = await chatSessionRef.current.sendMessageStream({ message: userMessage });
+      let fullResponse = '';
+      
+      // Add an initial empty model message to stream into
+      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+      for await (const chunk of stream) {
+        fullResponse += chunk.text;
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1] = { role: 'model', text: fullResponse };
+          return newMessages;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessages(prev => [...prev, { role: 'model', text: "I'm having a little trouble connecting. Please try again or call us directly!" }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
+      {isOpen && (
+        <div className="mb-6 w-[350px] md:w-[400px] h-[550px] glass-card !bg-white dark:!bg-slate-900 rounded-[2.5rem] shadow-4xl flex flex-col overflow-hidden border border-white/20 ring-4 ring-black/5 animate-in slide-in-from-bottom-10 duration-500">
+          <div className="bg-blue-700 p-8 text-white flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center relative">
+                <div className="w-3 h-3 bg-green-500 rounded-full absolute -top-1 -right-1 border-2 border-blue-700"></div>
+                <ChatBubbleBottomCenterTextIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="font-black text-lg tracking-tight">Melissa AI</div>
+                <div className="text-[10px] uppercase font-bold tracking-widest opacity-70">Always Online</div>
+              </div>
+            </div>
+            <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-white/10 rounded-xl transition-all">
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 dark:bg-slate-950/50">
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] p-5 rounded-3xl text-sm font-bold leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-white/5 rounded-tl-none'}`}>
+                  {msg.text || <div className="flex gap-1 py-1"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce delay-75"></div><div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce delay-150"></div></div>}
+                </div>
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+          </div>
+
+          <form onSubmit={handleSendMessage} className="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5 flex gap-4 items-center">
+            <input 
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Type your message..." 
+              className="flex-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+            />
+            <button type="submit" className="w-12 h-12 bg-blue-700 text-white rounded-2xl flex items-center justify-center hover:bg-blue-800 transition-all shadow-lg active:scale-95 disabled:opacity-50" disabled={isTyping}>
+              <PaperAirplaneIcon className="w-6 h-6" />
+            </button>
+          </form>
+        </div>
+      )}
+      
+      <button 
+        onClick={() => {
+          setIsOpen(!isOpen);
+          startChat();
+        }} 
+        className={`w-20 h-20 rounded-[2.5rem] flex items-center justify-center shadow-4xl transition-all duration-500 hover:scale-110 active:scale-95 group relative ${isOpen ? 'bg-red-500 text-white rotate-90 shadow-red-500/40' : 'bg-blue-700 text-white shadow-blue-500/40'}`}
+      >
+        {!isOpen && (
+          <div className="absolute -top-2 -right-2 bg-orange-500 text-[10px] font-black px-2 py-1 rounded-lg animate-bounce border-2 border-white dark:border-slate-950">
+            Live Chat
+          </div>
+        )}
+        {isOpen ? <XMarkIcon className="w-10 h-10" /> : <ChatBubbleBottomCenterTextIcon className="w-10 h-10" />}
+      </button>
     </div>
   );
 };
@@ -197,7 +322,7 @@ const App: React.FC = () => {
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
-          systemInstruction: 'You are Melissa, a friendly and ultra-professional AI receptionist for Peel AI.'
+          systemInstruction: 'You are Melissa, a friendly and ultra-professional AI receptionist for Peel AI. Your job is to demonstrate how effectively an AI can handle incoming HVAC calls, book appointments, and explain rebates.'
         }
       });
       sessionRef.current = await sessionPromise;
@@ -223,7 +348,7 @@ const App: React.FC = () => {
             <div className="w-12 h-12 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-all">
               <MicrophoneIcon className="w-7 h-7 text-white" />
             </div>
-            <span className="font-black text-xl md:text-2xl tracking-tighter hidden sm:block">Peel AI Systems</span>
+            <span className="font-black text-xl md:text-2xl tracking-tighter hidden sm:block text-slate-900 dark:text-white">Peel AI Systems</span>
           </button>
           <div className="hidden md:flex items-center gap-10 text-xs">
             <button onClick={() => scrollToSection('features')} className="hover:text-blue-500 transition-colors font-black uppercase tracking-[0.2em] dark:text-slate-100">Features</button>
@@ -260,22 +385,22 @@ const App: React.FC = () => {
       <section className="relative pt-20 pb-28 px-4 md:px-8 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 lg:gap-24">
           <div className="flex-1 text-center md:text-left z-10">
-            <div className="inline-flex items-center gap-3 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-400 px-6 py-2 rounded-full text-[11px] font-black mb-8 uppercase tracking-[0.3em] shadow-xl shadow-blue-500/10">
+            <div className="inline-flex items-center gap-3 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-400 px-6 py-2 rounded-full text-[11px] font-black mb-8 uppercase tracking-[0.3em] shadow-xl shadow-blue-500/10 border border-blue-200/20">
               <span className={`w-2.5 h-2.5 rounded-full ${isVoiceActive ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`}></span>
-              {isVoiceActive ? 'Melissa is Listening...' : 'HVAC SaaS Redefined'}
+              {isVoiceActive ? 'Melissa is Listening...' : 'The Next Gen HVAC Front Desk'}
             </div>
             <h1 className="text-7xl md:text-8xl lg:text-9xl font-black mb-10 leading-[0.8] tracking-tighter dark:text-white">
               Turn Missed Calls <br/>Into <span className="text-orange-500 drop-shadow-sm">Booked Jobs.</span>
             </h1>
             <p className="text-xl md:text-3xl text-slate-600 dark:text-slate-300 mb-14 max-w-2xl leading-tight font-bold opacity-90">
-              Never lose a late-night lead again. Melissa handles dispatching while you focus on the wrench.
+              Never lose a late-night lead again. Melissa handles dispatching while you focus on the wrench. Try the live receptionist demo.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center md:justify-start">
               <button onClick={startVoiceDemo} className={`px-12 py-6 rounded-3xl font-black text-2xl shadow-3xl transition-all flex items-center justify-center gap-5 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white shadow-red-500/40' : 'bg-blue-700 text-white shadow-blue-500/40 hover:bg-blue-800'}`}>
-                {isVoiceActive ? 'Hang Up' : 'Live Voice Demo'} <MicrophoneIcon className="w-7 h-7" />
+                {isVoiceActive ? 'Stop Demo' : 'Live Voice Receptionist'} <MicrophoneIcon className="w-7 h-7" />
               </button>
-              <button onClick={() => scrollToSection('pricing')} className="bg-white text-slate-950 border-2 border-slate-100 px-12 py-6 rounded-3xl font-black text-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-3 dark:bg-slate-900 dark:text-white dark:border-white/10 shadow-xl">
-                View Plans <ArrowRightIcon className="w-6 h-6" />
+              <button onClick={() => scrollToSection('analytics')} className="bg-white text-slate-950 border-2 border-slate-100 px-12 py-6 rounded-3xl font-black text-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-3 dark:bg-slate-900 dark:text-white dark:border-white/10 shadow-xl">
+                Explore Tech <ArrowRightIcon className="w-6 h-6" />
               </button>
             </div>
           </div>
@@ -371,7 +496,7 @@ const App: React.FC = () => {
             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-24">
               <div className="flex-1">
                 <span className="bg-orange-500 text-white px-8 py-2.5 rounded-full text-[13px] font-black uppercase mb-10 inline-block tracking-[0.3em] shadow-2xl shadow-orange-500/30">Ontario Rebate Hub 2026</span>
-                <h2 className="text-7xl md:text-9xl font-black mb-12 leading-[0.8] tracking-tighter">
+                <h2 className="text-7xl md:text-9xl font-black mb-12 leading-[0.8] tracking-tighter text-white">
                   Close Sales <br/>With <span className="text-orange-400">$10,500</span>
                 </h2>
                 <div className="grid grid-cols-2 gap-8 mb-14">
@@ -557,6 +682,9 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Floating Chat Widget */}
+      <LiveChatWidget />
     </div>
   );
 };
