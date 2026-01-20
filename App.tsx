@@ -21,7 +21,10 @@ import {
   InformationCircleIcon,
   MapPinIcon,
   WrenchScrewdriverIcon,
-  CpuChipIcon
+  CpuChipIcon,
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/solid';
 
 // --- Helper Functions for Audio Processing ---
@@ -230,6 +233,7 @@ const App: React.FC = () => {
           </button>
           <div className="hidden md:flex items-center gap-8 text-sm">
             <button onClick={() => scrollToSection('features')} className="hover:text-orange-500 transition-colors font-black uppercase tracking-wider">Features</button>
+            <button onClick={() => scrollToSection('analytics')} className="hover:text-orange-500 transition-colors font-black uppercase tracking-wider">Analytics</button>
             <button onClick={() => scrollToSection('rebates')} className="hover:text-orange-500 transition-colors font-black uppercase tracking-wider">Rebates</button>
             <button onClick={() => scrollToSection('pricing')} className="hover:text-orange-500 transition-colors font-black uppercase tracking-wider">Pricing</button>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
@@ -248,6 +252,7 @@ const App: React.FC = () => {
       {isMenuOpen && (
         <div className="fixed inset-0 z-[60] bg-white dark:bg-slate-900 pt-24 px-6 md:hidden flex flex-col gap-8 animate-in fade-in slide-in-from-top duration-300">
           <button onClick={() => scrollToSection('features')} className="text-3xl font-black text-left">Features</button>
+          <button onClick={() => scrollToSection('analytics')} className="text-3xl font-black text-left">Analytics</button>
           <button onClick={() => scrollToSection('rebates')} className="text-3xl font-black text-left">Rebates</button>
           <button onClick={() => scrollToSection('pricing')} className="text-3xl font-black text-left">Pricing</button>
           <a href={`tel:${CONFIG.emergencyPhone}`} className="text-blue-600 text-3xl font-black flex items-center gap-4"><PhoneIcon className="w-8 h-8" /> {CONFIG.emergencyPhone}</a>
@@ -279,6 +284,100 @@ const App: React.FC = () => {
           </div>
           <div className="flex-1 w-full relative">
             <HeroAnimation isActive={isVoiceActive} />
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="features" className="py-24 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-24">
+            <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-4 block">Core Technology</span>
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">Built Specifically for HVAC Pros</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard title="24/7 AI Voice" icon={<MicrophoneIcon className="w-8 h-8 text-blue-600"/>} description="Melissa handles every call instantly, from midnight furnace failures to routine maintenance." />
+            <FeatureCard title="Live Booking" icon={<CalendarIcon className="w-8 h-8 text-orange-600"/>} description="Syncs directly with Jobber, Housecall Pro, and ServiceTitan to book jobs on the spot." />
+            <FeatureCard title="SMS Lead Alerts" icon={<ChatBubbleBottomCenterTextIcon className="w-8 h-8 text-teal-600"/>} description="Get instant transcripts and high-priority lead notifications sent to your tech's phone." />
+          </div>
+        </div>
+      </section>
+
+      {/* Advanced Analytics Section */}
+      <section id="analytics" className="py-24 px-4 md:px-8 bg-slate-900/5 dark:bg-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-16 items-center">
+            <div className="flex-1 space-y-8">
+              <span className="bg-blue-600 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase inline-block tracking-[0.2em]">New: Advanced Analytics</span>
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter">Data-Driven <br/><span className="text-blue-600">Growth Insights.</span></h2>
+              <p className="text-xl text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                Stop guessing. See exactly how many calls Melissa is converting into real revenue with our enterprise-grade dashboard.
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="p-6 glass-card rounded-3xl border border-white/20 shadow-sm flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                    <ArrowTrendingUpIcon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-black">94%</div>
+                    <div className="text-[10px] uppercase font-black tracking-widest text-slate-400">Conversion Rate</div>
+                  </div>
+                </div>
+                <div className="p-6 glass-card rounded-3xl border border-white/20 shadow-sm flex items-center gap-4">
+                  <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+                    <UserCircleIcon className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-black">2.4m</div>
+                    <div className="text-[10px] uppercase font-black tracking-widest text-slate-400">Avg. Call Time</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full">
+              <div className="bg-[#020617] p-8 md:p-12 rounded-[4rem] border border-white/5 shadow-3xl">
+                <div className="flex justify-between items-center mb-10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">Live Volume Feed</span>
+                  </div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-blue-500">Last 7 Days</div>
+                </div>
+                
+                {/* Mock Chart Visualization */}
+                <div className="h-64 flex items-end justify-between gap-2 md:gap-4 mb-8">
+                  {[40, 65, 45, 80, 55, 95, 70].map((height, i) => (
+                    <div key={i} className="flex-1 group relative">
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        {height}
+                      </div>
+                      <div 
+                        className="w-full bg-gradient-to-t from-blue-900 to-blue-500 rounded-t-xl transition-all duration-1000 ease-out group-hover:brightness-125"
+                        style={{ height: `${height}%` }}
+                      ></div>
+                      <div className="mt-4 text-[8px] font-black uppercase text-slate-600 text-center">Day {i+1}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-8 border-t border-white/5 grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-[10px] font-black uppercase text-slate-500 mb-1">Total Calls</div>
+                    <div className="text-xl font-black">1,284</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[10px] font-black uppercase text-slate-500 mb-1">Booked</div>
+                    <div className="text-xl font-black text-blue-400">412</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[10px] font-black uppercase text-slate-500 mb-1">Revenue</div>
+                    <div className="text-xl font-black text-orange-400">$184k</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -347,7 +446,45 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Audit Form Section (Refined) */}
+      {/* Pricing Section */}
+      <section id="pricing" className="py-32 px-4 md:px-8 bg-slate-950 text-white rounded-t-[5rem]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter">Simple Pricing.</h2>
+            <p className="text-2xl text-slate-400 font-medium">No contracts. No hidden fees. Cancel in 1-click.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-stretch">
+            {CONFIG.pricing.map((tier, i) => (
+              <div 
+                key={i} 
+                className={`p-10 md:p-12 rounded-[4rem] flex flex-col transition-all duration-500 hover:scale-[1.02] ${tier.popular ? 'bg-white text-slate-900 shadow-[0_0_80px_rgba(30,64,175,0.3)]' : 'bg-slate-900/50 text-white border border-slate-800'}`}
+              >
+                <h3 className="text-3xl font-black mb-4 tracking-tight text-center">{tier.name}</h3>
+                <div className="flex items-center justify-center gap-1 mb-8">
+                  <span className="text-5xl font-black tracking-tighter">{tier.price}</span>
+                  <span className="text-slate-400 font-bold">/mo</span>
+                </div>
+                <div className="space-y-6 mb-14 flex-grow">
+                  {tier.features.map((f, j) => (
+                    <div key={j} className="flex items-center gap-4">
+                      <CheckBadgeIcon className={`w-5 h-5 ${tier.popular ? 'text-blue-600' : 'text-blue-400'}`} />
+                      <span className="text-sm font-black uppercase tracking-widest">{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => scrollToSection('audit-form')} 
+                  className={`w-full py-6 rounded-[2rem] font-black text-xl transition-all active:scale-95 ${tier.popular ? 'bg-blue-700 text-white hover:bg-blue-800 shadow-2xl shadow-blue-500/40' : 'bg-white text-slate-900 hover:bg-slate-100'}`}
+                >
+                  Get Started
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Audit Form Section */}
       <section id="audit-form" className="py-32 px-4 md:px-8 bg-[#020617] text-white">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-20 items-center">
             <div className="flex-1">
@@ -365,7 +502,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex-1 w-full max-w-xl">
-               <div className="glass-card !bg-white/5 !border-white/10 p-12 md:p-16 rounded-[4rem] shadow-3xl relative">
+               <div className="glass-card !bg-white/5 !border-white/10 p-12 md:p-16 rounded-[4rem] shadow-3xl relative border">
                   <div className="absolute -top-4 -right-4 bg-blue-600 px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest shadow-xl">30s Setup</div>
                   <h3 className="text-4xl font-black mb-10 tracking-tight">Claim Your Free AI Audit</h3>
                   <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Audit received! Our team will contact you shortly."); }}>
@@ -431,10 +568,10 @@ const App: React.FC = () => {
               <h4 className="font-black text-xs uppercase tracking-[0.2em] text-blue-400 mb-8">SaaS Platform</h4>
               <ul className="space-y-4 text-sm text-slate-500 font-bold">
                 <li><button onClick={() => scrollToSection('features')} className="hover:text-white transition-colors">Core Features</button></li>
+                <li><button onClick={() => scrollToSection('analytics')} className="hover:text-white transition-colors">Advanced Analytics</button></li>
                 <li><button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors">Pricing Plans</button></li>
                 <li><button onClick={() => scrollToSection('rebates')} className="hover:text-white transition-colors">Rebate Tools</button></li>
                 <li><a href="#" className="hover:text-white transition-colors">White-Label Docs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Status</a></li>
               </ul>
             </div>
 
