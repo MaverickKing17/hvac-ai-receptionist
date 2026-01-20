@@ -75,43 +75,80 @@ function createBlob(data: Float32Array): { data: string; mimeType: string } {
 const HeroAnimation: React.FC<{ isActive: boolean }> = ({ isActive }) => {
   return (
     <div className="relative w-full aspect-square max-w-lg mx-auto flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center opacity-20">
-        <div className={`w-full h-full rounded-full border border-blue-400 dark:border-blue-600 ${isActive ? 'animate-pulse-ring' : 'opacity-20'}`}></div>
-        <div className={`absolute w-[80%] h-[80%] rounded-full border border-orange-400 dark:border-orange-600 ${isActive ? 'animate-pulse-ring' : 'opacity-20'}`} style={{ animationDelay: '1s' }}></div>
+      {/* Dynamic Background Ripples when Active */}
+      {isActive && (
+        <div className="absolute inset-0 flex items-center justify-center z-0">
+          <div className="absolute w-40 h-40 border-4 border-orange-500/30 rounded-full animate-ripple"></div>
+          <div className="absolute w-40 h-40 border-4 border-orange-500/20 rounded-full animate-ripple" style={{ animationDelay: '0.6s' }}></div>
+          <div className="absolute w-40 h-40 border-4 border-orange-500/10 rounded-full animate-ripple" style={{ animationDelay: '1.2s' }}></div>
+        </div>
+      )}
+
+      {/* Decorative pulse rings */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-20 z-0">
+        <div className={`w-full h-full rounded-full border-2 border-blue-400 dark:border-blue-600 ${isActive ? 'animate-pulse-ring' : 'opacity-20'}`}></div>
+        <div className={`absolute w-[80%] h-[80%] rounded-full border-2 border-orange-400 dark:border-orange-600 ${isActive ? 'animate-pulse-ring' : 'opacity-20'}`} style={{ animationDelay: '1s' }}></div>
       </div>
 
+      {/* Main Container */}
       <div className="relative z-20 group">
-        <div className={`absolute -inset-12 bg-blue-500/30 blur-[100px] rounded-full transition-all duration-700 ${isActive ? 'opacity-100 scale-150' : 'opacity-0'}`}></div>
-        <div className="relative w-48 h-48 bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl flex items-center justify-center border border-white/50 dark:border-slate-800 animate-float ring-1 ring-white/10">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/20 to-orange-500/20 rounded-[3rem]"></div>
-          <div className="relative flex flex-col items-center gap-4">
-            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl transition-all duration-500 ${isActive ? 'bg-orange-600 scale-110 shadow-orange-500/50' : 'bg-blue-700 shadow-blue-500/40'}`}>
-              <MicrophoneIcon className="w-10 h-10 text-white" />
+        <div className={`absolute -inset-20 bg-blue-500/20 blur-[120px] rounded-full transition-all duration-1000 ${isActive ? 'opacity-100 scale-150' : 'opacity-0'}`}></div>
+        
+        <div className={`relative w-56 h-56 bg-white dark:bg-slate-900 rounded-[3.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center border border-white/50 dark:border-slate-800 transition-all duration-500 ${isActive ? 'scale-105 ring-2 ring-orange-500/50' : 'animate-float ring-1 ring-white/10'}`}>
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/10 to-orange-500/10 rounded-[3.5rem]"></div>
+          
+          <div className="relative flex flex-col items-center gap-6">
+            {/* Pulsing Mic Icon Container */}
+            <div className={`w-24 h-24 rounded-[2rem] flex items-center justify-center shadow-2xl transition-all duration-700 ${isActive ? 'bg-orange-600 scale-110 animate-mic-glow' : 'bg-blue-700'}`}>
+              <MicrophoneIcon className={`w-12 h-12 text-white transition-transform duration-500 ${isActive ? 'scale-110' : ''}`} />
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-[10px] font-black tracking-[0.3em] text-blue-700 dark:text-blue-400 uppercase mb-1">Melissa AI</span>
-              <div className="flex gap-1.5 items-center h-6">
-                {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <div 
-                    key={i} 
-                    className={`w-1 bg-blue-500 rounded-full transition-all duration-300 ${isActive ? 'animate-waveform' : 'h-1.5 opacity-30'}`} 
-                    style={{ animationDelay: `${i * 0.1}s`, height: isActive ? 'auto' : '6px' }}
-                  ></div>
-                ))}
+            
+            <div className="flex flex-col items-center w-full px-6">
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-[10px] font-black tracking-[0.4em] uppercase transition-colors duration-500 ${isActive ? 'text-orange-500' : 'text-blue-700 dark:text-blue-400'}`}>
+                  {isActive ? 'Live Interaction' : 'Melissa AI'}
+                </span>
+                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>}
+              </div>
+
+              {/* Enhanced Waveform Visualizer */}
+              <div className="flex gap-1.5 items-center h-8 justify-center">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => {
+                  // Varied heights for a more natural waveform look
+                  const delay = i * 0.08;
+                  const baseHeight = isActive ? (i % 2 === 0 ? 'h-6' : 'h-8') : 'h-1.5';
+                  return (
+                    <div 
+                      key={i} 
+                      className={`w-1.5 rounded-full transition-all duration-300 origin-center ${isActive ? 'bg-orange-500 animate-wave-dynamic' : 'bg-blue-500 opacity-20'}`} 
+                      style={{ 
+                        animationDelay: `${delay}s`,
+                        height: isActive ? 'auto' : '6px',
+                        minHeight: isActive ? (i % 3 === 0 ? '12px' : '18px') : '6px'
+                      }}
+                    ></div>
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="absolute w-full h-full animate-orbit">
-        <div className="absolute top-0 left-1/2 -ml-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center shadow-lg transform -rotate-12 border-orange-200">
-          <PhoneIcon className="w-6 h-6 text-orange-500" />
+      {/* Orbiting UI Elements */}
+      <div className="absolute w-full h-full animate-orbit pointer-events-none">
+        <div className="absolute top-0 left-1/2 -ml-7 w-14 h-14 glass-card rounded-2xl flex items-center justify-center shadow-2xl transform -rotate-12 border-orange-200">
+          <PhoneIcon className="w-7 h-7 text-orange-500" />
         </div>
       </div>
-      <div className="absolute w-full h-full animate-orbit" style={{ animationDelay: '-5s' }}>
-        <div className="absolute top-0 left-1/2 -ml-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center shadow-lg transform rotate-12 border-blue-200">
-          <CalendarIcon className="w-6 h-6 text-blue-600" />
+      <div className="absolute w-full h-full animate-orbit pointer-events-none" style={{ animationDelay: '-8s' }}>
+        <div className="absolute top-0 left-1/2 -ml-7 w-14 h-14 glass-card rounded-2xl flex items-center justify-center shadow-2xl transform rotate-12 border-blue-200">
+          <CalendarIcon className="w-7 h-7 text-blue-600" />
+        </div>
+      </div>
+      <div className="absolute w-full h-full animate-orbit pointer-events-none" style={{ animationDelay: '-16s' }}>
+        <div className="absolute top-0 left-1/2 -ml-7 w-14 h-14 glass-card rounded-2xl flex items-center justify-center shadow-2xl transform -rotate-45 border-teal-200">
+          <BoltIcon className="w-7 h-7 text-teal-600" />
         </div>
       </div>
     </div>
@@ -424,7 +461,7 @@ const App: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center md:justify-start">
               <button onClick={startVoiceDemo} className={`px-12 py-6 rounded-3xl font-black text-2xl shadow-3xl transition-all flex items-center justify-center gap-5 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white shadow-red-500/40' : 'bg-blue-700 text-white shadow-blue-500/40 hover:bg-blue-800'}`}>
-                {isVoiceActive ? 'Stop Demo' : 'Live Voice Receptionist'} <MicrophoneIcon className="w-7 h-7" />
+                {isVoiceActive ? 'Stop Interaction' : 'Live Voice Receptionist'} <MicrophoneIcon className="w-7 h-7" />
               </button>
               <button onClick={() => scrollToSection('analytics')} className="bg-white text-slate-950 border-2 border-slate-100 px-12 py-6 rounded-3xl font-black text-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-3 dark:bg-slate-900 dark:text-white dark:border-white/10 shadow-xl">
                 Explore Tech <ArrowRightIcon className="w-6 h-6" />
