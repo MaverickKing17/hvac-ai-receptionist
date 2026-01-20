@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CONFIG } from './constants';
 import { 
   PhoneIcon, 
@@ -13,8 +13,83 @@ import {
   ArrowRightIcon,
   StarIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  BoltIcon
 } from '@heroicons/react/24/solid';
+
+const HeroAnimation: React.FC = () => {
+  return (
+    <div className="relative w-full aspect-square max-w-lg mx-auto flex items-center justify-center overflow-hidden">
+      {/* Background Decorative Rings */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-20">
+        <div className="w-full h-full rounded-full border border-blue-400 dark:border-blue-600 animate-pulse-ring"></div>
+        <div className="absolute w-[80%] h-[80%] rounded-full border border-orange-400 dark:border-orange-600 animate-pulse-ring" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute w-[60%] h-[60%] rounded-full border border-teal-400 dark:border-teal-600 animate-pulse-ring" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Central AI Node */}
+      <div className="relative z-20 group">
+        <div className="absolute -inset-8 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/40 transition-all duration-700"></div>
+        <div className="relative w-40 h-40 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl flex items-center justify-center border border-white/50 dark:border-slate-800 animate-float">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/10 to-orange-500/10 rounded-[2.5rem]"></div>
+          <div className="relative flex flex-col items-center gap-2">
+            <div className="w-16 h-16 bg-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/40">
+              <MicrophoneIcon className="w-8 h-8 text-white" />
+            </div>
+            <span className="text-xs font-black tracking-tighter text-blue-700 dark:text-blue-400">MELISSA AI</span>
+            {/* Visual Listening Waves */}
+            <div className="flex gap-1 items-center h-4">
+              <div className="w-1 h-2 bg-blue-500 rounded-full animate-waveform" style={{ animationDelay: '0s' }}></div>
+              <div className="w-1 h-3 bg-blue-400 rounded-full animate-waveform" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-1 h-4 bg-blue-600 rounded-full animate-waveform" style={{ animationDelay: '0.4s' }}></div>
+              <div className="w-1 h-2 bg-blue-500 rounded-full animate-waveform" style={{ animationDelay: '0.6s' }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating Elements (Orbiting) */}
+      <div className="absolute w-full h-full animate-orbit">
+        <div className="absolute top-0 left-1/2 -ml-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center shadow-lg transform -rotate-12 border-orange-200">
+          <PhoneIcon className="w-6 h-6 text-orange-500" />
+        </div>
+      </div>
+      <div className="absolute w-full h-full animate-orbit" style={{ animationDelay: '-5s' }}>
+        <div className="absolute top-0 left-1/2 -ml-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center shadow-lg transform rotate-12 border-blue-200">
+          <CalendarIcon className="w-6 h-6 text-blue-600" />
+        </div>
+      </div>
+      <div className="absolute w-full h-full animate-orbit" style={{ animationDelay: '-10s' }}>
+        <div className="absolute top-0 left-1/2 -ml-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center shadow-lg border-teal-200">
+          <UserGroupIcon className="w-6 h-6 text-teal-600" />
+        </div>
+      </div>
+      <div className="absolute w-full h-full animate-orbit" style={{ animationDelay: '-15s' }}>
+        <div className="absolute top-0 left-1/2 -ml-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center shadow-lg border-rose-200">
+          <BoltIcon className="w-6 h-6 text-rose-500" />
+        </div>
+      </div>
+
+      {/* Incoming Call Animation Tracks */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className="animate-incoming absolute" style={{ top: '20%', left: '10%', animationDelay: '0s' }}>
+           <div className="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-xl text-[10px] font-bold border border-slate-100 dark:border-slate-700 flex items-center gap-2">
+             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+             Incoming: Brampton No Heat
+           </div>
+        </div>
+        <div className="animate-incoming absolute" style={{ top: '60%', left: '5%', animationDelay: '2s' }}>
+           <div className="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-xl text-[10px] font-bold border border-slate-100 dark:border-slate-700 flex items-center gap-2">
+             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+             Booking: AC Service 2PM
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -40,23 +115,25 @@ const App: React.FC = () => {
       <nav className="sticky top-0 z-50 glass-card px-4 py-3 md:px-8">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img src={CONFIG.logoUrl} alt={CONFIG.companyName} className="h-8 md:h-10 rounded shadow-sm" />
+            <div className="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <MicrophoneIcon className="w-6 h-6 text-white" />
+            </div>
             <span className="font-bold text-lg md:text-xl tracking-tight hidden sm:block">{CONFIG.companyName}</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="hover:text-orange-500 transition-colors font-medium">Features</a>
-            <a href="#rebates" className="hover:text-orange-500 transition-colors font-medium">Rebates</a>
-            <a href="#pricing" className="hover:text-orange-500 transition-colors font-medium">Pricing</a>
+          <div className="hidden md:flex items-center gap-8 text-sm">
+            <a href="#features" className="hover:text-orange-500 transition-colors font-bold uppercase tracking-wider">Features</a>
+            <a href="#rebates" className="hover:text-orange-500 transition-colors font-bold uppercase tracking-wider">Rebates</a>
+            <a href="#pricing" className="hover:text-orange-500 transition-colors font-bold uppercase tracking-wider">Pricing</a>
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             >
-              {isDarkMode ? <SunIcon className="w-6 h-6 text-yellow-400" /> : <MoonIcon className="w-6 h-6 text-slate-700" />}
+              {isDarkMode ? <SunIcon className="w-5 h-5 text-yellow-400" /> : <MoonIcon className="w-5 h-5 text-slate-700" />}
             </button>
             <a 
               href={`tel:${CONFIG.emergencyPhone}`} 
-              className="bg-blue-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-800 transition-all active:scale-95 flex items-center gap-2"
+              className="bg-blue-700 text-white px-6 py-2.5 rounded-full font-black shadow-lg shadow-blue-500/20 hover:bg-blue-800 transition-all active:scale-95 flex items-center gap-2"
             >
               <PhoneIcon className="w-4 h-4" />
               {CONFIG.emergencyPhone}
@@ -97,120 +174,104 @@ const App: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative pt-12 pb-20 px-4 md:px-8 overflow-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 px-4 py-1.5 rounded-full text-sm font-bold mb-6 animate-pulse">
-              <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-              Emergency? 24/7 No Heat? Talk Now
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+          <div className="flex-1 text-center md:text-left z-10">
+            <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full text-xs font-black mb-6 uppercase tracking-widest animate-pulse">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              The Future of HVAC Dispatching
             </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-              {CONFIG.heroTagline}
+            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black mb-8 leading-[0.9] tracking-tighter">
+              Turn Missed Calls <br/>Into <span className="text-orange-500">Booked Jobs.</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-2xl leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium">
               {CONFIG.heroSubheadline}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start">
               <button 
                 onClick={toggleVoice}
-                className="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-blue-500/30 hover:bg-blue-800 transition-all flex items-center justify-center gap-3 active:scale-95 group"
+                className="bg-blue-700 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-blue-500/40 hover:bg-blue-800 transition-all flex items-center justify-center gap-4 active:scale-95 group relative overflow-hidden"
               >
+                <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                 <div className={`flex items-end gap-0.5 h-6 ${isVoiceActive ? 'animate-waveform' : ''}`}>
-                  <div className="waveform-bar"></div>
-                  <div className="waveform-bar"></div>
-                  <div className="waveform-bar"></div>
-                  <div className="waveform-bar"></div>
-                  <div className="waveform-bar"></div>
-                  <div className="waveform-bar"></div>
+                  <div className="waveform-bar !bg-white"></div>
+                  <div className="waveform-bar !bg-white"></div>
+                  <div className="waveform-bar !bg-white"></div>
+                  <div className="waveform-bar !bg-white"></div>
                 </div>
-                Talk to AI Agent Now
+                {isVoiceActive ? 'Stop AI Demo' : 'Live Voice Demo'}
               </button>
               <a 
                 href="#pricing"
-                className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2 dark:bg-slate-800 dark:text-white dark:border-slate-700"
+                className="bg-white text-slate-900 border-2 border-slate-100 px-10 py-5 rounded-2xl font-black text-xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2 dark:bg-slate-800 dark:text-white dark:border-slate-700"
               >
-                Get Your Demo Site
+                View Plans
                 <ArrowRightIcon className="w-5 h-5" />
               </a>
             </div>
 
-            <div className="mt-12 flex flex-wrap justify-center md:justify-start gap-6 opacity-75">
+            <div className="mt-14 flex flex-wrap justify-center md:justify-start gap-8">
               {CONFIG.guarantees.map((g, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm font-semibold">
-                  <CheckBadgeIcon className="w-5 h-5 text-teal-600" />
+                <div key={i} className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500">
+                  <CheckBadgeIcon className="w-5 h-5 text-orange-500" />
                   {g}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex-1 w-full max-w-lg">
-            <div className="glass-card p-6 md:p-8 rounded-3xl relative">
-              <div className="absolute -top-4 -right-4 bg-orange-500 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg">
-                LIVE DEMO
-              </div>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-2xl flex items-center justify-center">
-                  <MicrophoneIcon className="w-8 h-8 text-blue-700 dark:text-blue-300" />
+          <div className="flex-1 w-full relative">
+            <HeroAnimation />
+            {/* Overlay Info Card */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-xs glass-card p-4 rounded-2xl border-white/50 shadow-2xl animate-float" style={{ animationDelay: '1s' }}>
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckBadgeIcon className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="text-xs font-black uppercase tracking-wider">Job Booked Successfully</div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold italic">"Say: My furnace died in Brampton"</h3>
-                  <p className="text-sm text-slate-500">Melissa - 24/7 AI Receptionist</p>
+                <div className="text-[10px] text-slate-500 font-bold">
+                    "Melissa booked a Furnace Repair in Oakville for 3:00 PM today. Added to your Jobber calendar."
                 </div>
-              </div>
-
-              <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl mb-6 border border-slate-100 dark:border-slate-800">
-                <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <span className="bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-lg text-xs font-bold h-fit">YOU</span>
-                    <p className="text-sm italic">"Hey, my heating isn't working and it's freezing outside..."</p>
-                  </div>
-                  <div className="flex gap-2 justify-end text-right">
-                    <p className="text-sm font-medium text-blue-700 dark:text-blue-400">"I'm sorry to hear that! I can help. Is this an emergency in Brampton? I have a slot open at 2:00 PM today."</p>
-                    <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-lg text-xs font-bold h-fit">AI</span>
-                  </div>
-                </div>
-              </div>
-
-              <button 
-                onClick={toggleVoice}
-                className={`w-full py-4 rounded-xl font-black text-lg transition-all ${isVoiceActive ? 'bg-red-500 text-white' : 'bg-blue-700 text-white shadow-lg'}`}
-              >
-                {isVoiceActive ? 'END CALL' : 'CLICK TO TRY MELISSA'}
-              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Trust Banner */}
-      <div className="bg-slate-900 text-white py-12 px-4 border-y border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
+      <div className="bg-slate-900 text-white py-14 px-4 border-y border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="flex items-center gap-10">
             <div className="text-center">
-              <div className="text-3xl font-black text-orange-500">4.9/5</div>
-              <div className="text-xs uppercase tracking-widest font-bold">Google Rating</div>
+              <div className="text-4xl font-black text-orange-500 tracking-tighter">4.9/5</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 mt-1">Google Reviews</div>
             </div>
-            <div className="h-10 w-px bg-slate-700"></div>
+            <div className="h-12 w-px bg-slate-800"></div>
             <div className="text-center">
-              <div className="text-3xl font-black text-blue-400">200+</div>
-              <div className="text-xs uppercase tracking-widest font-bold">HVAC Pros Onboard</div>
+              <div className="text-4xl font-black text-blue-400 tracking-tighter">24/7</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 mt-1">Availability</div>
+            </div>
+            <div className="h-12 w-px bg-slate-800"></div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-teal-400 tracking-tighter">10s</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 mt-1">Setup Time</div>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-             {/* Mock Certifications */}
-             <div className="font-bold tracking-tighter text-xl">GOOGLE GUARANTEED</div>
-             <div className="font-bold tracking-tighter text-xl">HRAI MEMBER</div>
-             <div className="font-bold tracking-tighter text-xl">ENERGY STAR</div>
+          <div className="flex flex-wrap justify-center gap-10 opacity-40 font-black tracking-widest text-sm uppercase">
+             <span>Google Guaranteed</span>
+             <span>HRAI Member</span>
+             <span>Energy Star</span>
+             <span>BAHCA Approved</span>
           </div>
         </div>
       </div>
 
       {/* Features Grid */}
-      <section id="features" className="py-24 px-4 md:px-8">
+      <section id="features" className="py-32 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Built Specifically for HVAC</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">The tech stack you need to compete with the big guys, without the big franchise fees.</p>
+          <div className="text-center mb-24">
+            <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-4 block">Core Technology</span>
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">Built Specifically for HVAC Pros</h2>
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium">Everything you need to run a 7-figure HVAC business while you're in the attic.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -249,54 +310,51 @@ const App: React.FC = () => {
       </section>
 
       {/* Rebates Urgency Section */}
-      <section id="rebates" className="py-16 px-4 md:px-8">
+      <section id="rebates" className="py-20 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-[3rem] p-8 md:p-16 text-white overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+          <div className="bg-gradient-to-br from-slate-900 to-blue-950 rounded-[4rem] p-8 md:p-20 text-white overflow-hidden relative border border-white/5">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
               <div className="flex-1">
-                <span className="bg-orange-500 text-white px-4 py-1 rounded-full text-xs font-black uppercase mb-6 inline-block tracking-widest">Limited Time 2026</span>
-                <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
-                  Maximize Your Clients' Savings up to <span className="text-orange-400">{CONFIG.rebateAmount}</span>
+                <span className="bg-orange-500 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase mb-8 inline-block tracking-[0.2em]">2026 Ontario Program</span>
+                <h2 className="text-5xl md:text-7xl font-black mb-8 leading-[0.9] tracking-tighter">
+                  Close Sales Faster <br/>With <span className="text-orange-400">{CONFIG.rebateAmount}</span> Rebates
                 </h2>
-                <p className="text-lg text-indigo-100 mb-8 max-w-xl">
-                  Our built-in Rebate Calculator helps your sales team show immediate ROI on heat pump installations and attic insulation. Stop guessing, start closing.
+                <p className="text-xl text-blue-200/70 mb-10 max-w-xl leading-relaxed">
+                  Our AI doesn't just answer phones—it educates callers on available Enbridge and HER+ savings, qualifying higher-ticket heat pump leads before you even arrive.
                 </p>
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                   <div className="bg-white/10 p-4 rounded-xl border border-white/20">
-                     <div className="font-black text-2xl">$7,100</div>
-                     <div className="text-xs text-indigo-200">Enbridge Heat Pump</div>
+                <div className="grid grid-cols-2 gap-5 mb-10">
+                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
+                     <div className="font-black text-3xl mb-1">$7,100</div>
+                     <div className="text-[10px] uppercase tracking-widest font-black text-blue-300">Hybrid Heat Pump</div>
                    </div>
-                   <div className="bg-white/10 p-4 rounded-xl border border-white/20">
-                     <div className="font-black text-2xl">$1,500</div>
-                     <div className="text-xs text-indigo-200">Attic Insulation</div>
+                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
+                     <div className="font-black text-3xl mb-1">$1,500</div>
+                     <div className="text-[10px] uppercase tracking-widest font-black text-blue-300">Attic Insulation</div>
                    </div>
                 </div>
-                <button className="bg-white text-blue-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all active:scale-95 shadow-xl shadow-black/20">
-                  Try Rebate Calculator Stub
+                <button className="bg-white text-blue-900 px-10 py-5 rounded-2xl font-black text-xl hover:bg-blue-50 transition-all active:scale-95 shadow-2xl shadow-black/40">
+                  Open Rebate Tool
                 </button>
               </div>
-              <div className="flex-1 w-full flex justify-center">
-                <div className="glass-card !bg-white/10 !border-white/20 p-8 rounded-3xl w-full max-w-sm">
-                   <div className="space-y-6">
-                      <div className="flex justify-between items-center pb-4 border-b border-white/10">
-                        <span className="font-bold">Program</span>
-                        <span className="font-bold">Max Reward</span>
+              <div className="flex-1 w-full">
+                <div className="glass-card !bg-white/5 !border-white/10 p-10 rounded-[3rem] w-full max-w-md mx-auto shadow-2xl">
+                   <h3 className="text-xl font-black mb-8 text-center uppercase tracking-widest">Active Incentives</h3>
+                   <div className="space-y-8">
+                      <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                        <span className="font-bold text-blue-200">HER+ Ontario</span>
+                        <span className="font-black text-orange-400 text-2xl">$10,000</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm opacity-80">HER+ Ontario</span>
-                        <span className="font-bold text-orange-400">$10,000</span>
+                      <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                        <span className="font-bold text-blue-200">Greener Homes</span>
+                        <span className="font-black text-orange-400 text-2xl">$5,000</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm opacity-80">Greener Homes</span>
-                        <span className="font-bold text-orange-400">$5,000</span>
+                      <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                        <span className="font-bold text-blue-200">Enbridge Bonus</span>
+                        <span className="font-black text-orange-400 text-2xl">$600</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm opacity-80">Enbridge Bonus</span>
-                        <span className="font-bold text-orange-400">$600</span>
-                      </div>
-                      <div className="pt-4 mt-4 border-t border-white/20 text-center text-xs opacity-60 italic">
-                        *Estimates based on current 2026 guidelines.
+                      <div className="pt-6 text-center text-[10px] font-black tracking-widest opacity-30 italic uppercase">
+                        *Live Data Fed From NRCAN 2026
                       </div>
                    </div>
                 </div>
@@ -307,26 +365,31 @@ const App: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 px-4 md:px-8 bg-slate-50 dark:bg-slate-900/30">
+      <section className="py-32 px-4 md:px-8 bg-slate-50 dark:bg-slate-900/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Trusted by GTA HVAC Pros</h2>
-            <div className="flex justify-center gap-1 text-yellow-500 mb-2">
-              {[...Array(5)].map((_, i) => <StarIcon key={i} className="w-6 h-6" />)}
+          <div className="text-center mb-24">
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">Contractors ❤️ Melissa</h2>
+            <div className="flex justify-center gap-1 text-yellow-500 mb-4">
+              {[...Array(5)].map((_, i) => <StarIcon key={i} className="w-8 h-8" />)}
             </div>
-            <p className="font-bold text-slate-500">Google Verified Reviews</p>
+            <p className="font-black text-slate-500 uppercase tracking-widest text-xs">Verified Google Local Service Reviews</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {CONFIG.testimonials.map((t, i) => (
-              <div key={i} className="glass-card p-8 rounded-3xl flex flex-col h-full">
-                <div className="flex text-yellow-500 mb-4">
+              <div key={i} className="glass-card p-10 rounded-[3rem] flex flex-col h-full border-white shadow-xl hover:shadow-2xl transition-all">
+                <div className="flex text-yellow-500 mb-6">
                   {[...Array(t.rating)].map((_, i) => <StarIcon key={i} className="w-4 h-4" />)}
                 </div>
-                <p className="text-slate-700 dark:text-slate-300 mb-8 italic flex-grow leading-relaxed">"{t.text}"</p>
-                <div>
-                  <div className="font-black text-lg">{t.name}</div>
-                  <div className="text-sm text-slate-500">{t.location}</div>
+                <p className="text-lg text-slate-700 dark:text-slate-300 mb-10 italic flex-grow leading-relaxed font-medium">"{t.text}"</p>
+                <div className="flex items-center gap-4 pt-6 border-t border-slate-100 dark:border-slate-800">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center font-black text-blue-700">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-black text-lg tracking-tight">{t.name}</div>
+                    <div className="text-xs uppercase font-black text-slate-400 tracking-widest">{t.location}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -334,55 +397,40 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-24 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Your New Website in 4 Steps</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">We do the heavy lifting so you can focus on the tools.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            <div className="hidden lg:block absolute top-12 left-0 w-full h-1 bg-blue-100 dark:bg-blue-900 -z-10"></div>
-            <StepCard number="1" title="Customize" desc="Choose your colors, upload your logo, and pick your service areas." />
-            <StepCard number="2" title="Train AI" desc="Provide your service pricing and typical answers for Melissa." />
-            <StepCard number="3" title="Go Live" desc="We point your domain and your phone lines to the AI hub." />
-            <StepCard number="4" title="Book Jobs" desc="Sit back as the AI qualifies leads and books slots in your calendar." />
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
-      <section id="pricing" className="py-24 px-4 md:px-8 bg-slate-950 text-white rounded-t-[4rem]">
+      <section id="pricing" className="py-32 px-4 md:px-8 bg-slate-950 text-white rounded-t-[5rem]">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-black mb-6">Simple, Honest Pricing</h2>
-            <p className="text-xl text-slate-400">No long-term contracts. Cancel anytime.</p>
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter">Simple Pricing.</h2>
+            <p className="text-2xl text-slate-400 font-medium tracking-tight">No contracts. No hidden fees. Cancel in 1-click.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-stretch">
             {CONFIG.pricing.map((tier, i) => (
               <div 
                 key={i} 
-                className={`p-8 md:p-10 rounded-[2.5rem] flex flex-col h-full transition-all duration-300 hover:translate-y-[-10px] ${tier.popular ? 'bg-white text-slate-900 pricing-card-popular ring-8 ring-blue-600/10' : 'bg-slate-900 text-white border border-slate-800'}`}
+                className={`p-10 md:p-12 rounded-[4rem] flex flex-col transition-all duration-500 hover:scale-[1.02] ${tier.popular ? 'bg-white text-slate-900 shadow-[0_0_80px_rgba(30,64,175,0.3)]' : 'bg-slate-900/50 text-white border border-slate-800'}`}
               >
                 {tier.popular && (
-                  <div className="bg-orange-500 text-white text-[10px] font-black tracking-widest uppercase px-4 py-1.5 rounded-full w-fit mb-6">Most Popular</div>
+                  <div className="bg-orange-500 text-white text-[10px] font-black tracking-[0.3em] uppercase px-5 py-2 rounded-full w-fit mb-10 mx-auto">Scaling Fast</div>
                 )}
-                <h3 className="text-2xl font-black mb-2">{tier.name}</h3>
-                <div className="flex items-end gap-1 mb-4">
-                  <span className="text-4xl font-black">{tier.price}</span>
+                <h3 className="text-3xl font-black mb-4 tracking-tight text-center">{tier.name}</h3>
+                <div className="flex items-center justify-center gap-1 mb-8">
+                  <span className="text-5xl font-black tracking-tighter">{tier.price}</span>
+                  <span className="text-slate-400 font-bold">/mo</span>
                 </div>
-                <p className={`mb-8 text-sm ${tier.popular ? 'text-slate-600' : 'text-slate-400'}`}>{tier.description}</p>
-                <div className="space-y-4 mb-10 flex-grow">
+                <p className={`mb-12 text-center text-sm font-medium leading-relaxed ${tier.popular ? 'text-slate-500' : 'text-slate-400'}`}>{tier.description}</p>
+                <div className="space-y-6 mb-14 flex-grow">
                   {tier.features.map((f, j) => (
-                    <div key={j} className="flex items-center gap-3">
-                      <CheckBadgeIcon className={`w-5 h-5 ${tier.popular ? 'text-blue-600' : 'text-orange-500'}`} />
-                      <span className="text-sm font-semibold">{f}</span>
+                    <div key={j} className="flex items-center gap-4">
+                      <div className={`p-1 rounded-full ${tier.popular ? 'bg-blue-100' : 'bg-blue-900/30'}`}>
+                        <CheckBadgeIcon className={`w-5 h-5 ${tier.popular ? 'text-blue-600' : 'text-blue-400'}`} />
+                      </div>
+                      <span className="text-sm font-black uppercase tracking-widest">{f}</span>
                     </div>
                   ))}
                 </div>
-                <button className={`w-full py-4 rounded-xl font-black text-lg transition-all active:scale-95 ${tier.popular ? 'bg-blue-700 text-white hover:bg-blue-800 shadow-xl shadow-blue-500/30' : 'bg-white text-slate-900 hover:bg-slate-100'}`}>
+                <button className={`w-full py-6 rounded-[2rem] font-black text-xl transition-all active:scale-95 ${tier.popular ? 'bg-blue-700 text-white hover:bg-blue-800 shadow-2xl shadow-blue-500/40' : 'bg-white text-slate-900 hover:bg-slate-100'}`}>
                   Get Started
                 </button>
               </div>
@@ -391,73 +439,66 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Final CTA Footer */}
-      <footer className="bg-slate-950 text-white pt-24 pb-12 px-4 md:px-8 border-t border-slate-900">
+      {/* Footer */}
+      <footer className="bg-slate-950 text-white pt-32 pb-16 px-4 md:px-8 border-t border-slate-900">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 mb-32">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-8">Ready to automate your GTA HVAC business?</h2>
-              <p className="text-lg text-slate-400 mb-12 max-w-lg">
+              <h2 className="text-5xl md:text-7xl font-black mb-10 leading-[0.9] tracking-tighter">Automate Your <br/>HVAC Business.</h2>
+              <p className="text-xl text-slate-400 mb-16 max-w-lg leading-relaxed font-medium">
                 Join 200+ contractors who are winning the local search game and booking more no-heat calls with AI.
               </p>
-              <div className="space-y-6">
-                 <div className="flex items-center gap-4">
-                   <div className="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-slate-800">
-                      <PhoneIcon className="w-6 h-6 text-orange-500" />
+              <div className="space-y-10">
+                 <div className="flex items-center gap-6">
+                   <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center border border-slate-800 shadow-xl">
+                      <PhoneIcon className="w-8 h-8 text-orange-500" />
                    </div>
                    <div>
-                     <div className="text-sm text-slate-500">Emergency Line</div>
-                     <div className="text-xl font-bold">{CONFIG.emergencyPhone}</div>
-                   </div>
-                 </div>
-                 <div className="flex items-center gap-4">
-                   <div className="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-slate-800">
-                      <ChatBubbleBottomCenterTextIcon className="w-6 h-6 text-blue-500" />
-                   </div>
-                   <div>
-                     <div className="text-sm text-slate-500">Service Areas</div>
-                     <div className="text-sm font-medium">{CONFIG.serviceAreas.join(', ')}</div>
+                     <div className="text-[10px] uppercase font-black text-slate-500 tracking-[0.2em] mb-1">Direct Line</div>
+                     <div className="text-2xl font-black tracking-tight">{CONFIG.emergencyPhone}</div>
                    </div>
                  </div>
               </div>
             </div>
 
-            <div className="glass-card !bg-slate-900/50 !border-slate-800 p-8 md:p-10 rounded-[3rem]">
-              <h3 className="text-2xl font-black mb-6">Get Your Branded Demo</h3>
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <div className="glass-card !bg-white/5 !border-white/10 p-10 md:p-14 rounded-[4rem] shadow-2xl">
+              <h3 className="text-3xl font-black mb-10 tracking-tight">Claim Your Free AI Audit</h3>
+              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                 <div>
-                  <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Company Name</label>
-                  <input type="text" placeholder="Your HVAC Co" className="w-full bg-slate-800 border-none rounded-xl p-4 focus:ring-2 focus:ring-blue-600 transition-all outline-none" />
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-3 block">Company Name</label>
+                  <input type="text" placeholder="e.g. Toronto Heating Experts" className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-5 focus:ring-2 focus:ring-blue-600 transition-all outline-none font-bold" />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Email Address</label>
-                    <input type="email" placeholder="owner@company.com" className="w-full bg-slate-800 border-none rounded-xl p-4 focus:ring-2 focus:ring-blue-600 transition-all outline-none" />
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-3 block">Work Email</label>
+                    <input type="email" placeholder="owner@hvac.com" className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-5 focus:ring-2 focus:ring-blue-600 transition-all outline-none font-bold" />
                   </div>
                   <div>
-                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Phone Number</label>
-                    <input type="tel" placeholder="416-555-1234" className="w-full bg-slate-800 border-none rounded-xl p-4 focus:ring-2 focus:ring-blue-600 transition-all outline-none" />
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-3 block">Phone Number</label>
+                    <input type="tel" placeholder="416-000-0000" className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-5 focus:ring-2 focus:ring-blue-600 transition-all outline-none font-bold" />
                   </div>
                 </div>
-                <button className="w-full bg-blue-700 text-white py-5 rounded-xl font-black text-xl hover:bg-blue-800 transition-all active:scale-95 shadow-2xl shadow-blue-500/20 mt-4">
-                  Send My Free Audit
+                <button className="w-full bg-blue-700 text-white py-6 rounded-2xl font-black text-xl hover:bg-blue-800 transition-all active:scale-95 shadow-2xl shadow-blue-500/30 mt-6">
+                  Get My Free Demo Site
                 </button>
-                <p className="text-[10px] text-center text-slate-600 mt-4">
-                  By clicking, you agree to our 2026 Privacy Policy and Terms of Service. Melissa might text you to confirm.
+                <p className="text-[10px] text-center text-slate-500 mt-8 font-black uppercase tracking-widest opacity-50">
+                  © 2026 {CONFIG.companyName} Automation
                 </p>
               </form>
             </div>
           </div>
 
-          <div className="pt-12 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <img src={CONFIG.logoUrl} alt={CONFIG.companyName} className="h-6 grayscale opacity-50" />
-              <span className="text-sm text-slate-600 font-bold">© 2026 {CONFIG.companyName} SaaS. All Rights Reserved.</span>
+          <div className="pt-16 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
+                 <MicrophoneIcon className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-sm text-slate-500 font-black uppercase tracking-widest">Peel AI Systems</span>
             </div>
-            <div className="flex gap-8 text-sm text-slate-500 font-semibold">
-              <a href="#" className="hover:text-white">Privacy</a>
-              <a href="#" className="hover:text-white">Terms</a>
-              <a href="#" className="hover:text-white">White-Label Docs</a>
+            <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
+              <a href="#" className="hover:text-white transition-colors">Privacy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms</a>
+              <a href="#" className="hover:text-white transition-colors">API Status</a>
             </div>
           </div>
         </div>
@@ -465,21 +506,26 @@ const App: React.FC = () => {
 
       {/* Sticky Bottom Bar for Mobile */}
       <div className="md:hidden fixed bottom-0 left-0 w-full z-50 p-4">
-        <div className="glass-card flex items-center justify-between p-3 rounded-2xl border border-white/40 shadow-2xl">
+        <div className="glass-card flex items-center justify-between p-3 rounded-3xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
            <a href={`tel:${CONFIG.emergencyPhone}`} className="flex flex-col items-center gap-0.5 px-4 text-blue-700">
              <PhoneIcon className="w-6 h-6" />
-             <span className="text-[10px] font-black">CALL NOW</span>
+             <span className="text-[10px] font-black">CALL</span>
            </a>
            <button 
             onClick={toggleVoice}
-            className="flex-grow mx-4 bg-blue-700 text-white rounded-xl py-3 font-black text-sm shadow-lg active:scale-95"
+            className="flex-grow mx-4 bg-blue-700 text-white rounded-2xl py-4 font-black text-sm shadow-xl active:scale-95 flex items-center justify-center gap-2"
            >
-             TALK TO AI AGENT
+             <div className={`flex items-end gap-0.5 h-3 ${isVoiceActive ? 'animate-waveform' : ''}`}>
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+             </div>
+             TALK TO AI
            </button>
            <button className="flex flex-col items-center gap-0.5 px-4 text-slate-600">
-             <ChatBubbleBottomCenterTextIcon className="w-6 h-6" />
-             <span className="text-[10px] font-black">QUOTE</span>
-           </button>
+             <StarIcon className="w-6 h-6" />
+             <span className="text-[10px] font-black">DEMO</span>
+           </a>
         </div>
       </div>
     </div>
@@ -487,22 +533,12 @@ const App: React.FC = () => {
 };
 
 const FeatureCard: React.FC<{icon: React.ReactNode, title: string, description: string}> = ({ icon, title, description }) => (
-  <div className="glass-card p-8 rounded-[2rem] hover:translate-y-[-5px] transition-all duration-300 group">
-    <div className="mb-6 bg-slate-50 dark:bg-slate-900 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+  <div className="glass-card p-10 rounded-[3rem] hover:translate-y-[-10px] transition-all duration-500 group border-white shadow-lg hover:shadow-2xl">
+    <div className="mb-8 bg-slate-50 dark:bg-slate-900 w-20 h-20 rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-50 transition-all duration-500 shadow-sm">
       {icon}
     </div>
-    <h3 className="text-xl font-black mb-3">{title}</h3>
-    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{description}</p>
-  </div>
-);
-
-const StepCard: React.FC<{number: string, title: string, desc: string}> = ({ number, title, desc }) => (
-  <div className="text-center group relative">
-    <div className="w-16 h-16 bg-white dark:bg-slate-900 border-4 border-blue-600 text-blue-600 rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all relative z-10 shadow-xl">
-      {number}
-    </div>
-    <h3 className="text-lg font-black mb-2">{title}</h3>
-    <p className="text-sm text-slate-500 max-w-[12rem] mx-auto">{desc}</p>
+    <h3 className="text-2xl font-black mb-4 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
+    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-medium">{description}</p>
   </div>
 );
 
