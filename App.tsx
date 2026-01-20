@@ -342,28 +342,55 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen mesh-gradient selection:bg-orange-200 dark:selection:bg-blue-900 transition-colors duration-500">
-      <nav className="sticky top-0 z-50 glass-card px-4 py-4 md:px-8 border-b border-white/20">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-all">
-              <MicrophoneIcon className="w-7 h-7 text-white" />
+      {/* High-Impact Professional Navbar */}
+      <nav className="sticky top-0 z-50 px-4 md:px-8 transition-all duration-300">
+        <div className="max-w-[1440px] mx-auto mt-4 glass-card rounded-[2.5rem] border-white/20 dark:border-white/10 shadow-4xl px-8 py-5 flex justify-between items-center ring-1 ring-white/10 dark:ring-black/20">
+          <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="flex items-center gap-4 group">
+            <div className="w-14 h-14 bg-blue-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:scale-110 transition-all duration-500 ring-4 ring-blue-500/10">
+              <MicrophoneIcon className="w-8 h-8 text-white" />
             </div>
-            <span className="font-black text-xl md:text-2xl tracking-tighter hidden sm:block text-slate-900 dark:text-white">Peel AI Systems</span>
+            <div className="flex flex-col text-left">
+              <span className="font-black text-2xl md:text-3xl tracking-tighter text-slate-900 dark:text-white leading-none">Peel AI Systems</span>
+              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-600 dark:text-blue-400 mt-1 opacity-80">Pro SaaS Platform</span>
+            </div>
           </button>
-          <div className="hidden md:flex items-center gap-10 text-xs">
-            <button onClick={() => scrollToSection('features')} className="hover:text-blue-500 transition-colors font-black uppercase tracking-[0.2em] dark:text-slate-100">Features</button>
-            <button onClick={() => scrollToSection('analytics')} className="hover:text-blue-500 transition-colors font-black uppercase tracking-[0.2em] dark:text-slate-100">Analytics</button>
-            <button onClick={() => scrollToSection('rebates')} className="hover:text-blue-500 transition-colors font-black uppercase tracking-[0.2em] dark:text-slate-100">Rebates</button>
-            <button onClick={() => scrollToSection('pricing')} className="hover:text-blue-500 transition-colors font-black uppercase tracking-[0.2em] dark:text-slate-100">Pricing</button>
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-              {isDarkMode ? <SunIcon className="w-5 h-5 text-yellow-400" /> : <MoonIcon className="w-5 h-5 text-slate-700" />}
+
+          <div className="hidden lg:flex items-center gap-12">
+            {['FEATURES', 'ANALYTICS', 'REBATES', 'PRICING'].map((item) => (
+              <button 
+                key={item}
+                onClick={() => scrollToSection(item.toLowerCase())} 
+                className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all relative group"
+              >
+                {item}
+                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-blue-600 transition-all group-hover:w-full rounded-full"></span>
+              </button>
+            ))}
+            
+            <div className="h-10 w-[2px] bg-slate-200 dark:bg-white/10 mx-2"></div>
+
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)} 
+              className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-all border border-slate-200 dark:border-white/10 shadow-sm"
+            >
+              {isDarkMode ? <SunIcon className="w-6 h-6 text-yellow-400" /> : <MoonIcon className="w-6 h-6 text-slate-700" />}
             </button>
-            <a href={`tel:${CONFIG.emergencyPhone}`} className="bg-blue-700 text-white px-8 py-3.5 rounded-2xl font-black shadow-2xl shadow-blue-500/30 hover:bg-blue-800 transition-all flex items-center gap-3 hover:scale-105 active:scale-95">
-              <PhoneIcon className="w-5 h-5" /> {CONFIG.emergencyPhone}
+
+            <a 
+              href={`tel:${CONFIG.emergencyPhone}`} 
+              className="bg-blue-700 text-white px-10 py-5 rounded-[1.75rem] font-black text-xl shadow-[0_20px_40px_rgba(29,78,216,0.3)] hover:bg-blue-800 transition-all flex items-center gap-4 hover:scale-[1.05] active:scale-95 group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+              <PhoneIcon className="w-6 h-6 group-hover:rotate-12 transition-transform" /> 
+              {CONFIG.emergencyPhone}
             </a>
           </div>
-          <div className="md:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-xl hover:bg-white/10">
+
+          <div className="lg:hidden flex items-center gap-4">
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 rounded-xl bg-slate-100 dark:bg-white/5">
+              {isDarkMode ? <SunIcon className="w-5 h-5 text-yellow-400" /> : <MoonIcon className="w-5 h-5 text-slate-700" />}
+            </button>
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-3 rounded-xl hover:bg-white/10 border border-white/10">
               {isMenuOpen ? <XMarkIcon className="w-8 h-8" /> : <Bars3Icon className="w-8 h-8" />}
             </button>
           </div>
@@ -372,12 +399,12 @@ const App: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-[60] bg-white dark:bg-slate-950 pt-32 px-10 md:hidden flex flex-col gap-10 animate-in fade-in slide-in-from-top duration-300">
+        <div className="fixed inset-0 z-[60] bg-white dark:bg-slate-950 pt-32 px-10 lg:hidden flex flex-col gap-10 animate-in fade-in slide-in-from-top duration-300">
           <button onClick={() => scrollToSection('features')} className="text-4xl font-black text-left tracking-tighter">Features</button>
           <button onClick={() => scrollToSection('analytics')} className="text-4xl font-black text-left tracking-tighter">Analytics</button>
           <button onClick={() => scrollToSection('rebates')} className="text-4xl font-black text-left tracking-tighter">Rebates</button>
           <button onClick={() => scrollToSection('pricing')} className="text-4xl font-black text-left tracking-tighter">Pricing</button>
-          <a href={`tel:${CONFIG.emergencyPhone}`} className="text-blue-600 text-4xl font-black flex items-center gap-6"><PhoneIcon className="w-10 h-10" /> {CONFIG.emergencyPhone}</a>
+          <a href={`tel:${CONFIG.emergencyPhone}`} className="text-blue-600 text-4xl font-black flex items-center gap-6 mt-8"><PhoneIcon className="w-10 h-10" /> {CONFIG.emergencyPhone}</a>
         </div>
       )}
 
