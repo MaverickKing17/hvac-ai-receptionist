@@ -1,0 +1,7 @@
+{
+  "name": "HVAC AI SaaS Landing Page",
+  "description": "A premium, white-label AI voice receptionist and website platform for HVAC contractors in Toronto and the GTA.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
