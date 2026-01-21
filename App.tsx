@@ -1,28 +1,29 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
+import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
 import { CONFIG } from './constants';
 import { 
   PhoneIcon, 
-  ChatBubbleBottomCenterTextIcon, 
-  CheckBadgeIcon, 
   MicrophoneIcon,
   SunIcon,
   MoonIcon,
-  ArrowRightIcon,
-  CalendarIcon,
-  BoltIcon,
-  MapPinIcon,
-  WrenchScrewdriverIcon,
+  CheckBadgeIcon,
   CpuChipIcon,
-  ArrowTrendingUpIcon,
-  UserCircleIcon,
-  Bars3Icon,
+  ServerIcon,
+  CalendarDaysIcon,
+  BoltIcon,
+  ShieldCheckIcon,
+  ArrowUpRightIcon,
+  RectangleGroupIcon,
+  DevicePhoneMobileIcon,
+  GlobeAltIcon,
+  WrenchScrewdriverIcon,
+  ChatBubbleBottomCenterTextIcon,
   XMarkIcon,
-  PaperAirplaneIcon
+  SparklesIcon
 } from '@heroicons/react/24/solid';
 
-// --- Helper Functions for Audio Processing ---
+// --- Audio Helpers ---
 function decode(base64: string) {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -42,12 +43,7 @@ function encode(bytes: Uint8Array) {
   return btoa(binary);
 }
 
-async function decodeAudioData(
-  data: Uint8Array,
-  ctx: AudioContext,
-  sampleRate: number,
-  numChannels: number,
-): Promise<AudioBuffer> {
+async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: number, numChannels: number): Promise<AudioBuffer> {
   const dataInt16 = new Int16Array(data.buffer);
   const frameCount = dataInt16.length / numChannels;
   const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
@@ -66,175 +62,37 @@ function createBlob(data: Float32Array): { data: string; mimeType: string } {
   for (let i = 0; i < l; i++) {
     int16[i] = data[i] * 32768;
   }
-  return {
-    data: encode(new Uint8Array(int16.buffer)),
-    mimeType: 'audio/pcm;rate=16000',
-  };
+  return { data: encode(new Uint8Array(int16.buffer)), mimeType: 'audio/pcm;rate=16000' };
 }
 
-const HeroAnimation: React.FC<{ isActive: boolean }> = ({ isActive }) => {
+const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam' }> = ({ isActive, mode }) => {
+  const color = mode === 'sam' ? 'orange' : 'sky';
   return (
-    <div className="relative w-full aspect-square max-w-lg mx-auto flex items-center justify-center overflow-hidden">
-      {/* Dynamic Background Ripples when Active */}
-      {isActive && (
-        <div className="absolute inset-0 flex items-center justify-center z-0">
-          <div className="absolute w-32 h-32 border-2 border-orange-500/30 rounded-full animate-ripple"></div>
-          <div className="absolute w-32 h-32 border-2 border-orange-500/20 rounded-full animate-ripple" style={{ animationDelay: '0.6s' }}></div>
+    <div className="relative flex items-center justify-center h-[500px]">
+      <div className={`absolute inset-0 bg-${color}-500/10 blur-[120px] rounded-full animate-pulse transition-all duration-1000 ${isActive ? 'scale-150 opacity-40' : 'scale-100 opacity-20'}`}></div>
+      
+      <div className={`relative w-72 h-72 md:w-80 md:h-80 bg-white dark:bg-slate-900 rounded-[4rem] shadow-2xl border-4 ${isActive ? `border-${color}-500` : 'border-slate-200 dark:border-white/10'} transition-all duration-500 flex flex-col items-center justify-center p-8 overflow-hidden`}>
+        {/* Tech decorative patterns */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-50"></div>
+        <div className="absolute bottom-4 flex gap-1">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className={`w-1 h-4 rounded-full transition-all duration-300 ${isActive ? `bg-${color}-500 animate-wave-dynamic` : 'bg-slate-200 dark:bg-slate-800'}`} style={{ animationDelay: `${i * 0.05}s` }}></div>
+          ))}
         </div>
-      )}
 
-      {/* Decorative pulse rings */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-10 z-0">
-        <div className={`w-full h-full rounded-full border border-blue-400 dark:border-blue-600 ${isActive ? 'animate-pulse-ring' : 'opacity-10'}`}></div>
-        <div className={`absolute w-[80%] h-[80%] rounded-full border border-orange-400 dark:border-orange-600 ${isActive ? 'animate-pulse-ring' : 'opacity-10'}`} style={{ animationDelay: '1s' }}></div>
-      </div>
-
-      {/* Main Container */}
-      <div className="relative z-20 group">
-        <div className={`absolute -inset-16 bg-blue-500/10 blur-[100px] rounded-full transition-all duration-1000 ${isActive ? 'opacity-100 scale-150' : 'opacity-0'}`}></div>
+        <div className={`w-24 h-24 rounded-[2rem] flex items-center justify-center shadow-inner transition-all duration-700 ${isActive ? `bg-${color}-500 shadow-${color}-500/50 scale-110` : 'bg-slate-100 dark:bg-slate-800'}`}>
+          <MicrophoneIcon className={`w-12 h-12 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+        </div>
         
-        <div className={`relative w-40 h-40 md:w-48 md:h-48 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-4xl flex flex-col items-center justify-center border border-white/40 dark:border-slate-800 transition-all duration-500 ${isActive ? 'scale-105 ring-1 ring-orange-500/40' : 'animate-float ring-1 ring-white/5'}`}>
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 to-orange-500/5 rounded-[2.5rem]"></div>
-          
-          <div className="relative flex flex-col items-center gap-4">
-            <div className={`w-16 h-16 md:w-20 md:h-20 rounded-3xl flex items-center justify-center shadow-xl transition-all duration-700 ${isActive ? 'bg-orange-600 scale-110 animate-mic-glow' : 'bg-blue-700'}`}>
-              <MicrophoneIcon className={`w-8 h-8 md:w-10 md:h-10 text-white transition-transform duration-500 ${isActive ? 'scale-110' : ''}`} />
-            </div>
-            
-            <div className="flex flex-col items-center w-full px-4">
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <span className={`text-[8px] font-black tracking-[0.3em] uppercase transition-colors duration-500 ${isActive ? 'text-orange-500' : 'text-blue-700 dark:text-blue-400'}`}>
-                  {isActive ? 'Live' : 'Melissa AI'}
-                </span>
-                {isActive && <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse"></span>}
-              </div>
-
-              <div className="flex gap-1 items-center h-5 justify-center">
-                {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <div 
-                    key={i} 
-                    className={`w-0.5 rounded-full transition-all duration-300 origin-center ${isActive ? 'bg-orange-500 animate-wave-dynamic' : 'bg-blue-500 opacity-10'}`} 
-                    style={{ 
-                      animationDelay: `${i * 0.12}s`,
-                      height: isActive ? 'auto' : '3px',
-                      minHeight: isActive ? (i % 2 === 0 ? '8px' : '12px') : '3px'
-                    }}
-                  ></div>
-                ))}
-              </div>
-            </div>
-          </div>
+        <div className="mt-8 text-center">
+          <p className={`text-[10px] font-black uppercase tracking-[0.4em] mb-1 ${isActive ? `text-${color}-500` : 'text-slate-400'}`}>
+            {isActive ? `${mode.toUpperCase()} ACTIVE` : 'READY TO VOICE'}
+          </p>
+          <h4 className="text-lg font-black tracking-tight text-slate-800 dark:text-white">
+            {isActive ? (mode === 'chloe' ? 'Rebate Strategy' : 'Dispatch Logic') : 'ServiceVoice AI'}
+          </h4>
         </div>
       </div>
-
-      <div className="absolute w-full h-full animate-orbit pointer-events-none opacity-50">
-        <div className="absolute top-0 left-1/2 -ml-5 w-10 h-10 glass-card rounded-xl flex items-center justify-center shadow-lg transform -rotate-12 border-orange-200">
-          <PhoneIcon className="w-5 h-5 text-orange-500" />
-        </div>
-      </div>
-      <div className="absolute w-full h-full animate-orbit pointer-events-none opacity-50" style={{ animationDelay: '-8s' }}>
-        <div className="absolute top-0 left-1/2 -ml-5 w-10 h-10 glass-card rounded-xl flex items-center justify-center shadow-lg transform rotate-12 border-blue-200">
-          <CalendarIcon className="w-5 h-5 text-blue-600" />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const LiveChatWidget: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string }[]>([
-    { role: 'model', text: 'How can I help you today?' }
-  ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatSessionRef = useRef<any>(null);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const startChat = () => {
-    if (!chatSessionRef.current) {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-      chatSessionRef.current = ai.chats.create({
-        model: 'gemini-3-flash-preview',
-        config: {
-          systemInstruction: 'Be brief. Help the user understand HVAC SaaS benefits.'
-        }
-      });
-    }
-  };
-
-  const handleSendMessage = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!inputValue.trim()) return;
-
-    const userMessage = inputValue;
-    setInputValue('');
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setIsTyping(true);
-
-    try {
-      startChat();
-      const stream = await chatSessionRef.current.sendMessageStream({ message: userMessage });
-      let fullResponse = '';
-      setMessages(prev => [...prev, { role: 'model', text: '' }]);
-      for await (const chunk of stream) {
-        fullResponse += chunk.text;
-        setMessages(prev => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1] = { role: 'model', text: fullResponse };
-          return newMessages;
-        });
-      }
-    } catch (err) {
-      setMessages(prev => [...prev, { role: 'model', text: "Error. Try again." }]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  return (
-    <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end">
-      {isOpen && (
-        <div className="mb-3 w-[280px] md:w-[340px] h-[440px] glass-card !bg-white dark:!bg-slate-900 rounded-3xl shadow-4xl flex flex-col overflow-hidden border border-white/20 ring-1 ring-black/5 animate-in slide-in-from-bottom-2 duration-200">
-          <div className="bg-blue-700 p-4 text-white flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
-                <ChatBubbleBottomCenterTextIcon className="w-4 h-4" />
-              </div>
-              <div className="font-black text-xs">Melissa AI</div>
-            </div>
-            <button onClick={() => setIsOpen(false)} className="p-1"><XMarkIcon className="w-4 h-4" /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-slate-950/50">
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-xl text-[11px] font-bold leading-snug shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-white/5'}`}>
-                  {msg.text || "..."}
-                </div>
-              </div>
-            ))}
-            <div ref={chatEndRef} />
-          </div>
-          <form onSubmit={handleSendMessage} className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5 flex gap-2">
-            <input 
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Msg..." 
-              className="flex-1 bg-slate-100 dark:bg-slate-800/50 rounded-lg p-2.5 text-[10px] font-bold focus:ring-1 focus:ring-blue-500 outline-none transition-all dark:text-white"
-            />
-            <button type="submit" className="w-9 h-9 bg-blue-700 text-white rounded-lg flex items-center justify-center hover:bg-blue-800" disabled={isTyping}>
-              <PaperAirplaneIcon className="w-4 h-4" />
-            </button>
-          </form>
-        </div>
-      )}
-      <button onClick={() => { setIsOpen(!isOpen); startChat(); }} className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-3xl transition-all hover:scale-105 active:scale-95 ${isOpen ? 'bg-red-500 text-white' : 'bg-blue-700 text-white'}`}>
-        {isOpen ? <XMarkIcon className="w-6 h-6" /> : <ChatBubbleBottomCenterTextIcon className="w-6 h-6" />}
-      </button>
     </div>
   );
 };
@@ -242,11 +100,9 @@ const LiveChatWidget: React.FC = () => {
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showRebateTool, setShowRebateTool] = useState(false);
-  const [rebateValue, setRebateValue] = useState<number>(0);
-  const [selectedRebates, setSelectedRebates] = useState<string[]>([]);
-  
+  const [activePersona, setActivePersona] = useState<'chloe' | 'sam'>('chloe');
+  const [lastLead, setLastLead] = useState<any>(null);
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const outContextRef = useRef<AudioContext | null>(null);
   const nextStartTimeRef = useRef<number>(0);
@@ -258,35 +114,30 @@ const App: React.FC = () => {
     else document.documentElement.classList.remove('dark');
   }, [isDarkMode]);
 
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    }
-  };
-
-  const toggleRebate = (type: string, value: number) => {
-    if (selectedRebates.includes(type)) {
-      setSelectedRebates(prev => prev.filter(r => r !== type));
-      setRebateValue(prev => prev - value);
-    } else {
-      setSelectedRebates(prev => [...prev, type]);
-      setRebateValue(prev => prev + value);
-      setShowRebateTool(true);
-    }
-  };
-
   const startVoiceDemo = async () => {
-    if (isVoiceActive) {
-      stopVoiceDemo();
-      return;
-    }
+    if (isVoiceActive) { stopVoiceDemo(); return; }
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const leadFunction: FunctionDeclaration = {
+        name: 'submit_lead',
+        parameters: {
+          type: Type.OBJECT,
+          description: 'Submit customer lead data directly to the White-Label CRM.',
+          properties: {
+            name: { type: Type.STRING },
+            phone: { type: Type.STRING },
+            summary: { type: Type.STRING },
+            temp: { type: Type.STRING, description: 'HOT or WARM' },
+            persona: { type: Type.STRING, description: 'Chloe or Sam' }
+          },
+          required: ['name', 'phone', 'summary']
+        }
+      };
+
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-12-2025',
         callbacks: {
@@ -295,340 +146,296 @@ const App: React.FC = () => {
             const source = audioContextRef.current!.createMediaStreamSource(stream);
             const scriptProcessor = audioContextRef.current!.createScriptProcessor(4096, 1, 1);
             scriptProcessor.onaudioprocess = (e) => {
-              const inputData = e.inputBuffer.getChannelData(0);
-              const pcmBlob = createBlob(inputData);
-              sessionPromise.then(session => session.sendRealtimeInput({ media: pcmBlob }));
+              const pcmBlob = createBlob(e.inputBuffer.getChannelData(0));
+              sessionPromise.then(s => s.sendRealtimeInput({ media: pcmBlob }));
             };
             source.connect(scriptProcessor);
             scriptProcessor.connect(audioContextRef.current!.destination);
           },
           onmessage: async (msg: LiveServerMessage) => {
-            const audioData = msg.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
-            if (audioData && outContextRef.current) {
+            if (msg.toolCall) {
+              for (const fc of msg.toolCall.functionCalls) {
+                if (fc.name === 'submit_lead') {
+                  setLastLead(fc.args);
+                  sessionPromise.then(s => s.sendToolResponse({
+                    functionResponses: { id: fc.id, name: fc.name, response: { result: "lead successfully pushed to CRM" } }
+                  }));
+                }
+              }
+            }
+            const audio = msg.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
+            if (audio && outContextRef.current) {
               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outContextRef.current.currentTime);
-              const buffer = await decodeAudioData(decode(audioData), outContextRef.current, 24000, 1);
+              const buffer = await decodeAudioData(decode(audio), outContextRef.current, 24000, 1);
               const source = outContextRef.current.createBufferSource();
               source.buffer = buffer;
               source.connect(outContextRef.current.destination);
               source.start(nextStartTimeRef.current);
               nextStartTimeRef.current += buffer.duration;
               sourcesRef.current.add(source);
-              source.onended = () => sourcesRef.current.delete(source);
             }
-          },
-          onclose: () => stopVoiceDemo(),
+          }
         },
         config: {
           responseModalities: [Modality.AUDIO],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
-          systemInstruction: 'Be a professional AI receptionist. Demonstrate high quality voice interactions.'
+          tools: [{ functionDeclarations: [leadFunction] }],
+          systemInstruction: `You are ServiceVoice AI, a white-label voice solution. 
+          Today you are demonstrating your capabilities to an HVAC contractor.
+          PERSONAS:
+          - Chloe: Expert in 2026 Home Renovation Savings (HRS). Friendly. $7500 electric / $2000 gas rebates.
+          - Sam: Urgent emergency dispatcher. 4-hour guarantee.
+          SWITCHING: If they mention emergency (leak, no heat), switch to Sam.
+          MANDATORY: If gas smell, say: "Leave the house, hang up, call 911 immediately."`
         }
       });
       sessionRef.current = await sessionPromise;
-    } catch (err) {
-      alert("Mic access required.");
-    }
+    } catch (e) { alert("Mic required for demo."); }
   };
 
   const stopVoiceDemo = () => {
     setIsVoiceActive(false);
     if (sessionRef.current) sessionRef.current.close();
     if (audioContextRef.current) audioContextRef.current.close();
-    if (outContextRef.current) outContextRef.current.close();
     sourcesRef.current.forEach(s => s.stop());
-    sourcesRef.current.clear();
   };
 
   return (
-    <div className="min-h-screen mesh-gradient selection:bg-orange-200 dark:selection:bg-blue-900 transition-colors duration-500 overflow-x-hidden">
-      {/* Refined Small Navbar */}
-      <nav className="sticky top-0 z-50 px-3 md:px-6 transition-all duration-300">
-        <div className="max-w-[1100px] mx-auto mt-3 glass-card rounded-2xl border-white/20 dark:border-white/5 shadow-2xl px-5 py-3 flex justify-between items-center ring-1 ring-white/5">
-          <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-105 transition-all">
-              <MicrophoneIcon className="w-4 h-4 text-white" />
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-500">
+      {/* SaaS Nav Bar */}
+      <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center transform rotate-12 shadow-lg shadow-sky-600/20">
+              <BoltIcon className="w-6 h-6 text-white" />
             </div>
-            <div className="flex flex-col text-left">
-              <span className="font-black text-sm md:text-base tracking-tighter text-slate-900 dark:text-white leading-none uppercase">Peel AI</span>
-              <span className="text-[7px] font-black tracking-[0.25em] uppercase text-blue-600 dark:text-blue-400 mt-0.5 opacity-70">SaaS Platform</span>
-            </div>
-          </button>
-
-          <div className="hidden lg:flex items-center gap-6">
-            {['FEATURES', 'ANALYTICS', 'REBATES', 'PRICING'].map((item) => (
-              <button 
-                key={item}
-                onClick={() => scrollToSection(item.toLowerCase())} 
-                className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
-              >
-                {item}
-              </button>
-            ))}
-            <div className="h-4 w-px bg-slate-200 dark:bg-white/5 mx-1"></div>
-            <button 
-              onClick={() => setIsDarkMode(!isDarkMode)} 
-              className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-all border border-slate-200 dark:border-white/5 shadow-sm"
-            >
-              {isDarkMode ? <SunIcon className="w-4 h-4 text-yellow-400" /> : <MoonIcon className="w-4 h-4 text-slate-700" />}
-            </button>
-            <a 
-              href={`tel:${CONFIG.emergencyPhone}`} 
-              className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-xs shadow-lg hover:bg-blue-800 transition-all flex items-center gap-2 active:scale-95"
-            >
-              <PhoneIcon className="w-3.5 h-3.5" /> 
-              {CONFIG.emergencyPhone}
-            </a>
+            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">ServiceVoice<span className="text-sky-600">.</span></h1>
           </div>
 
-          <div className="lg:hidden flex items-center gap-2">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-lg border border-white/5">
-              <Bars3Icon className="w-5 h-5" />
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-sm font-bold uppercase tracking-widest hover:text-sky-600 transition-colors">Platform</a>
+            <a href="#pricing" className="text-sm font-bold uppercase tracking-widest hover:text-sky-600 transition-colors">Pricing</a>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">
+              {isDarkMode ? <SunIcon className="w-5 h-5 text-yellow-500" /> : <MoonIcon className="w-5 h-5 text-slate-700" />}
+            </button>
+            <button className="bg-sky-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl shadow-sky-600/20 hover:scale-105 active:scale-95 transition-all">
+              Book Tech Demo
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - Scaled Down */}
-      <section className="relative pt-12 pb-16 px-4 md:px-8">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10">
-          <div className="flex-1 text-center md:text-left z-10">
-            <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-400 px-4 py-1.5 rounded-full text-[8px] font-black mb-5 uppercase tracking-[0.15em] border border-blue-200/10">
-              <span className={`w-1.5 h-1.5 rounded-full ${isVoiceActive ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`}></span>
-              {isVoiceActive ? 'Melissa Listening...' : 'HVAC Front Desk AI'}
-            </div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-black mb-6 leading-tight tracking-tight dark:text-white">
-              Turn Missed Calls <br/>Into <span className="text-orange-500">Booked Jobs.</span>
-            </h1>
-            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 mb-8 max-w-lg leading-relaxed font-bold opacity-80">
-              Never lose a lead again. Melissa handles your dispatching while you focus on the wrench.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <button onClick={startVoiceDemo} className={`px-6 py-3 rounded-xl font-black text-sm shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white' : 'bg-blue-700 text-white hover:bg-blue-800'}`}>
-                {isVoiceActive ? 'End Call' : 'Try Voice AI'} <MicrophoneIcon className="w-4 h-4" />
-              </button>
-              <button onClick={() => scrollToSection('analytics')} className="bg-white dark:bg-slate-900 text-slate-950 dark:text-white border border-slate-100 dark:border-white/5 px-6 py-3 rounded-xl font-black text-sm hover:bg-slate-50 transition-all shadow-md">
-                View Tech
-              </button>
-            </div>
+      {/* Hero Section */}
+      <section className="pt-40 pb-20 px-6">
+        <div className="max-w-7xl mx-auto text-center space-y-12">
+          <div className="inline-flex items-center gap-2 bg-sky-500/10 text-sky-600 dark:text-sky-400 px-4 py-2 rounded-full border border-sky-500/20">
+            <SparklesIcon className="w-4 h-4 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">2026 HVAC SaaS Breakthrough</span>
           </div>
-          <div className="flex-1 w-full max-w-sm">
-            <HeroAnimation isActive={isVoiceActive} />
+
+          <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] max-w-5xl mx-auto">
+            Your Brand.<br/>
+            Our <span className="text-sky-600">Voice.</span><br/>
+            Total <span className="text-orange-500">Revenue.</span>
+          </h2>
+
+          <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400 font-medium max-w-3xl mx-auto leading-relaxed">
+            ServiceVoice provides HVAC contractors with high-fidelity AI agents that integrate directly with Jobber and ServiceTitan. Pre-qualify $10k rebates and dispatch 24/7.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={startVoiceDemo} 
+              className={`px-12 py-8 rounded-[2rem] font-black text-2xl shadow-2xl transition-all flex items-center justify-center gap-4 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}
+            >
+              {isVoiceActive ? 'Stop Demo Agent' : 'Live Demo: Talk To AI'}
+              <MicrophoneIcon className="w-6 h-6" />
+            </button>
+            <button className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-white/10 px-12 py-8 rounded-[2.5rem] font-black text-2xl hover:bg-slate-50 transition-all">
+              Get SaaS Quote
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Analytics - Compact */}
-      <section id="analytics" className="py-20 px-4 md:px-8 bg-slate-900/5 dark:bg-white/5 border-y border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-12 items-center">
-            <div className="flex-1 space-y-6">
-              <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em]">Intelligence</span>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">Growth Visible.</h2>
-              <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 font-bold max-w-md">
-                Stop guessing ROI. See conversion data in real-time.
-              </p>
+      {/* Interactive Demo Hub */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="glass-card rounded-[3rem] p-12 border-sky-500/20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <CpuChipIcon className="w-40 h-40" />
+            </div>
+            
+            <div className="space-y-8 relative z-10">
+              <h3 className="text-4xl font-black tracking-tighter">AI Persona Engine</h3>
+              <p className="text-lg text-slate-500 font-medium">Switch between Chloe (Sales) and Sam (Emergency) to see how the white-label agent handles different customer intents.</p>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 glass-card rounded-2xl border border-white/10 shadow-lg flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center">
-                    <ArrowTrendingUpIcon className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="text-lg font-black dark:text-white">94%</div>
-                    <div className="text-[8px] uppercase font-black text-blue-500">Success</div>
-                  </div>
-                </div>
-                <div className="p-4 glass-card rounded-2xl border border-white/10 shadow-lg flex items-center gap-4">
-                  <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/40 rounded-xl flex items-center justify-center">
-                    <UserCircleIcon className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <div className="text-lg font-black dark:text-white">2.4m</div>
-                    <div className="text-[8px] uppercase font-black text-orange-500">Response</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 w-full max-w-lg">
-              <div className="bg-[#020617] p-6 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden">
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-[9px] font-black uppercase text-slate-400">Live Dashboard Feed</span>
-                  <div className="text-[8px] font-black uppercase text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">Online</div>
-                </div>
-                <div className="h-32 flex items-end justify-between gap-2 mb-6">
-                  {[45, 70, 50, 85, 60, 100, 75].map((h, i) => (
-                    <div key={i} className="flex-1 bg-gradient-to-t from-blue-900/50 to-blue-500 rounded-t-lg transition-all" style={{ height: `${h}%` }}></div>
-                  ))}
-                </div>
-                <div className="pt-6 border-t border-white/10 grid grid-cols-3 gap-2">
-                  <div className="text-center">
-                    <div className="text-[8px] uppercase text-slate-500 mb-1">Traffic</div>
-                    <div className="text-base font-black text-white">1.2k</div>
-                  </div>
-                  <div className="text-center border-x border-white/5">
-                    <div className="text-[8px] uppercase text-slate-500 mb-1">Jobs</div>
-                    <div className="text-base font-black text-blue-400">412</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-[8px] uppercase text-slate-500 mb-1">Profit</div>
-                    <div className="text-base font-black text-orange-400">$18k</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Rebates - Dense */}
-      <section id="rebates" className="py-20 px-4 md:px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-[#0F172A] rounded-[3rem] p-8 md:p-12 text-white border border-white/5 shadow-3xl">
-            <div className="flex flex-col lg:flex-row items-center gap-12">
-              <div className="flex-1">
-                <span className="bg-orange-500 text-white px-5 py-1.5 rounded-full text-[9px] font-black uppercase mb-6 inline-block tracking-[0.1em]">2026 Rebate Hub</span>
-                <h2 className="text-2xl md:text-4xl font-black mb-8 leading-tight tracking-tight">
-                  Sales Growth <br/><span className="text-orange-400">$10,500</span>
-                </h2>
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                   <button onClick={() => toggleRebate('heatpump', 7100)} className={`p-6 rounded-2xl border transition-all text-left shadow-lg ${selectedRebates.includes('heatpump') ? 'bg-blue-600 border-blue-400' : 'bg-white/5 border-white/10'}`}>
-                     <div className="font-black text-2xl mb-1">$7.1k</div>
-                     <div className="text-[9px] uppercase font-black text-blue-200">Heat Pump</div>
-                   </button>
-                   <button onClick={() => toggleRebate('insulation', 1500)} className={`p-6 rounded-2xl border transition-all text-left shadow-lg ${selectedRebates.includes('insulation') ? 'bg-blue-600 border-blue-400' : 'bg-white/5 border-white/10'}`}>
-                     <div className="font-black text-2xl mb-1">$1.5k</div>
-                     <div className="text-[9px] uppercase font-black text-blue-200">Insulation</div>
-                   </button>
-                </div>
-                {showRebateTool && (
-                   <div className="mb-8 p-6 bg-blue-700 rounded-2xl border border-blue-500 flex items-center justify-between shadow-xl">
-                      <div>
-                        <div className="text-[8px] font-black uppercase text-blue-100 mb-1">Savings Forecast</div>
-                        <div className="text-3xl font-black">${rebateValue.toLocaleString()}</div>
-                      </div>
-                      <button onClick={() => { setShowRebateTool(false); setSelectedRebates([]); setRebateValue(0); }} className="text-[9px] uppercase font-black border border-white/20 px-3 py-1.5 rounded-lg">Reset</button>
-                   </div>
-                )}
-                <button onClick={() => scrollToSection('audit-form')} className="bg-white text-blue-950 px-8 py-4 rounded-xl font-black text-base shadow-xl active:scale-95 transition-all">
-                  Launch Proposal
+                <button 
+                  onClick={() => setActivePersona('chloe')} 
+                  className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'chloe' ? 'border-sky-500 bg-sky-500/10' : 'border-slate-200 dark:border-white/10'}`}
+                >
+                  <ChatBubbleBottomCenterTextIcon className="w-8 h-8 text-sky-600" />
+                  <span className="font-black text-xs uppercase tracking-widest">Chloe (Sales)</span>
+                </button>
+                <button 
+                  onClick={() => setActivePersona('sam')} 
+                  className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'sam' ? 'border-orange-500 bg-orange-500/10' : 'border-slate-200 dark:border-white/10'}`}
+                >
+                  <WrenchScrewdriverIcon className="w-8 h-8 text-orange-600" />
+                  <span className="font-black text-xs uppercase tracking-widest">Sam (Dispatch)</span>
                 </button>
               </div>
-              <div className="flex-1 w-full hidden lg:block max-w-xs">
-                <div className="glass-card !bg-slate-800/80 p-10 rounded-[2.5rem] shadow-4xl text-center">
-                   <h3 className="text-sm font-black mb-8 uppercase tracking-widest text-slate-400">Market Pulse</h3>
-                   <div className="space-y-8">
-                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                        <span className="font-bold text-slate-300 text-xs">HER+ Program</span>
-                        <span className="font-black text-orange-400 text-xl">$10k</span>
-                      </div>
-                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                        <span className="font-bold text-slate-300 text-xs">Enbridge</span>
-                        <span className="font-black text-orange-400 text-xl">$7k</span>
-                      </div>
-                      <div className="pt-4 text-[8px] font-black tracking-widest text-slate-600 uppercase">NRCAN Certified</div>
-                   </div>
+
+              {lastLead && (
+                <div className="mt-8 p-6 bg-green-500/10 border border-green-500/20 rounded-3xl animate-in zoom-in duration-500">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[10px] font-black uppercase text-green-600">Lead Pushed to CRM</span>
+                    <CheckBadgeIcon className="w-5 h-5 text-green-600" />
+                  </div>
+                  <pre className="text-[10px] font-mono opacity-60 overflow-x-auto">
+                    {JSON.stringify(lastLead, null, 2)}
+                  </pre>
                 </div>
+              )}
+            </div>
+          </div>
+
+          <ProductOrb isActive={isVoiceActive} mode={activePersona} />
+        </div>
+      </section>
+
+      {/* Feature Bento Grid */}
+      <section id="features" className="py-20 px-6 bg-slate-100 dark:bg-white/5">
+        <div className="max-w-7xl mx-auto space-y-20">
+          <div className="text-center">
+            <h3 className="text-4xl md:text-6xl font-black tracking-tighter">Contractor First Platform</h3>
+          </div>
+
+          <div className="grid md:grid-cols-12 gap-6 h-auto md:h-[600px]">
+            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col justify-between border-sky-500/10 hover:border-sky-500/30 transition-all">
+              <RectangleGroupIcon className="w-12 h-12 text-sky-600 mb-8" />
+              <div>
+                <h4 className="text-3xl font-black mb-4 tracking-tight">Full CRM Integration</h4>
+                <p className="text-lg text-slate-500 font-medium">Connect ServiceVoice to Jobber, ServiceTitan, or Housecall Pro in seconds. AI-captured leads appear instantly as 'Ready-to-Schedule' jobs in your dashboard.</p>
+              </div>
+            </div>
+            <div className="md:col-span-4 bg-sky-600 rounded-[3rem] p-10 text-white flex flex-col justify-between shadow-2xl shadow-sky-600/30">
+              <DevicePhoneMobileIcon className="w-12 h-12 mb-8" />
+              <div>
+                <h4 className="text-3xl font-black mb-4 tracking-tight">Mobile First</h4>
+                <p className="opacity-80 font-bold">Manage your AI settings from the job site. Update pricing or dispatch rules in real-time.</p>
+              </div>
+            </div>
+            <div className="md:col-span-4 glass-card rounded-[3rem] p-10 flex flex-col border-orange-500/10 hover:border-orange-500/30 transition-all">
+              <BoltIcon className="w-12 h-12 text-orange-600 mb-8" />
+              <h4 className="text-2xl font-black mb-4 tracking-tight">Instant ROI</h4>
+              <p className="text-sm text-slate-500 font-bold">The platform pays for itself with the first saved emergency furnace install. Typical ROI is 10x in the first 30 days.</p>
+            </div>
+            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col md:flex-row gap-8 items-center border-slate-200 dark:border-white/10">
+              <div className="flex-1">
+                <h4 className="text-3xl font-black mb-4 tracking-tight">Multi-Region Logic</h4>
+                <p className="text-lg text-slate-500 font-medium">Automatically route calls based on area code. Perfect for contractors covering massive regions like the GTA or Tri-State area.</p>
+              </div>
+              <div className="w-full md:w-64 h-32 bg-slate-200 dark:bg-slate-800 rounded-3xl flex items-center justify-center">
+                 <GlobeAltIcon className="w-16 h-16 opacity-20" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Audit Form - Refined */}
-      <section id="audit-form" className="py-24 px-4 md:px-8 bg-[#01040D] text-white">
-        <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
-            <div className="flex-1">
-              <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight tracking-tight text-white">Scale Your <br/><span className="text-blue-600">Empire.</span></h2>
-              <p className="text-sm md:text-base text-slate-400 mb-10 max-w-md font-black italic">Booking high tickets while you sleep.</p>
-              <div className="flex items-center gap-6">
-                 <div className="w-14 h-14 bg-blue-900/20 rounded-xl flex items-center justify-center border border-white/5">
-                    <PhoneIcon className="w-6 h-6 text-orange-500" />
-                 </div>
-                 <div>
-                   <div className="text-[9px] uppercase font-black text-blue-500 tracking-[0.1em] mb-0.5">Setup Line</div>
-                   <div className="text-2xl font-black text-white tracking-tighter">{CONFIG.emergencyPhone}</div>
-                 </div>
+      {/* Pricing Hub */}
+      <section id="pricing" className="py-32 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20 space-y-4">
+            <h3 className="text-4xl md:text-6xl font-black tracking-tighter">SaaS Plans</h3>
+            <p className="text-xl text-slate-500 font-bold">Simple, transparent pricing for any fleet size.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {CONFIG.pricing.map((tier, i) => (
+              <div key={i} className={`p-10 rounded-[3.5rem] border-2 flex flex-col transition-all duration-500 hover:scale-[1.02] ${tier.popular ? 'bg-sky-600 border-sky-500 text-white shadow-2xl shadow-sky-600/40' : 'glass-card border-slate-200 dark:border-white/10'}`}>
+                <h4 className="text-xl font-black uppercase tracking-widest mb-2 opacity-80">{tier.name}</h4>
+                <div className="text-5xl font-black mb-8">{tier.price}</div>
+                <p className={`text-lg font-bold mb-10 ${tier.popular ? 'opacity-90' : 'text-slate-500'}`}>{tier.description}</p>
+                <div className="space-y-4 mb-12 flex-1">
+                  {tier.features.map((f, j) => (
+                    <div key={j} className="flex items-center gap-4">
+                      <CheckBadgeIcon className="w-6 h-6 opacity-60" />
+                      <span className="text-xs font-black tracking-widest uppercase">{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button className={`w-full py-6 rounded-3xl font-black text-xl transition-all ${tier.popular ? 'bg-white text-sky-600' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
+                  Deploy AI
+                </button>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Professional SaaS Footer */}
+      <footer className="bg-slate-950 text-white pt-32 pb-16 px-6">
+        <div className="max-w-7xl mx-auto divide-y divide-white/10">
+          <div className="grid md:grid-cols-4 gap-16 pb-20">
+            <div className="md:col-span-1 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center">
+                  <BoltIcon className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-xl font-black tracking-tighter uppercase">ServiceVoice.</span>
+              </div>
+              <p className="text-sm font-bold opacity-40 leading-relaxed uppercase tracking-widest">
+                The leading 2026 white-label AI voice solution for HVAC contractors worldwide. 
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-sky-500">Product</h5>
+              <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
+                <li><a href="#" className="hover:text-white transition-colors">AI Agents</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Dashboard</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Voice Lab</a></li>
+              </ul>
             </div>
 
-            <div className="flex-1 w-full max-w-md">
-               <div className="glass-card !bg-white/5 p-8 md:p-10 rounded-[2.5rem] shadow-4xl relative border border-white/5 ring-1 ring-white/5">
-                  <h3 className="text-xl font-black mb-8 tracking-tight">Get Your Audit</h3>
-                  <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); alert("Team calling you shortly!"); }}>
-                    <div className="space-y-1.5">
-                       <label className="text-[8px] font-black uppercase tracking-[0.1em] text-blue-400 ml-1">Company Name</label>
-                       <input type="text" required placeholder="HVAC Co" className="w-full bg-[#080B14] border border-white/5 rounded-xl p-4 focus:ring-1 focus:ring-blue-600 outline-none font-bold text-base placeholder:text-slate-900" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       <div className="space-y-1.5">
-                          <label className="text-[8px] font-black uppercase tracking-[0.1em] text-blue-400 ml-1">Email</label>
-                          <input type="email" required placeholder="owner@hvac.ca" className="w-full bg-[#080B14] border border-white/5 rounded-xl p-4 focus:ring-1 focus:ring-blue-600 outline-none font-bold text-base placeholder:text-slate-900" />
-                       </div>
-                       <div className="space-y-1.5">
-                          <label className="text-[8px] font-black uppercase tracking-[0.1em] text-blue-400 ml-1">Mobile</label>
-                          <input type="tel" required placeholder="416-000-0000" className="w-full bg-[#080B14] border border-white/5 rounded-xl p-4 focus:ring-1 focus:ring-blue-600 outline-none font-bold text-base placeholder:text-slate-900" />
-                       </div>
-                    </div>
-                    <button type="submit" className="w-full bg-blue-700 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:bg-blue-800 active:scale-[0.98] transition-all mt-4 group flex items-center justify-center gap-3">
-                      Build Demo <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                    <p className="text-[8px] text-center text-slate-600 mt-5 font-black uppercase tracking-[0.1em]">Secure Partner Portal</p>
-                  </form>
+            <div className="space-y-6">
+              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-orange-500">Support</h5>
+              <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">API Status</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Partner Program</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact Support</a></li>
+              </ul>
+            </div>
+
+            <div className="space-y-6">
+              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">Legal</h5>
+              <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-16 flex flex-col md:flex-row justify-between items-center gap-8">
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">© 2026 ServiceVoice Technologies Inc.</p>
+            <div className="flex gap-6 opacity-40">
+               <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:opacity-100 transition-opacity cursor-pointer">
+                 <GlobeAltIcon className="w-4 h-4" />
+               </div>
+               <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:opacity-100 transition-opacity cursor-pointer">
+                 <ShieldCheckIcon className="w-4 h-4" />
                </div>
             </div>
-        </div>
-      </section>
-
-      {/* Footer - Minimal */}
-      <footer className="bg-[#01040D] text-white pt-16 pb-10 px-4 md:px-8 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center">
-                  <MicrophoneIcon className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-black text-xl tracking-tighter uppercase">Peel AI</span>
-              </div>
-              <p className="text-slate-500 text-xs font-bold leading-relaxed">GTA's automation engine for high-output contractors.</p>
-            </div>
-            <div>
-              <h4 className="font-black text-[9px] uppercase tracking-[0.2em] text-blue-500 mb-6 pl-3 border-l-2 border-blue-600">Hubs</h4>
-              <ul className="space-y-3 text-xs text-slate-400 font-bold">
-                <li>Toronto Metro</li>
-                <li>Peel Region</li>
-                <li>York Region</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-black text-[9px] uppercase tracking-[0.2em] text-blue-500 mb-6 pl-3 border-l-2 border-blue-600">Resources</h4>
-              <ul className="space-y-3 text-xs text-slate-400 font-bold">
-                <li><button onClick={() => scrollToSection('features')} className="hover:text-blue-500">Features</button></li>
-                <li><button onClick={() => scrollToSection('analytics')} className="hover:text-blue-500">Dashboard</button></li>
-                <li><button onClick={() => scrollToSection('rebates')} className="hover:text-blue-500">Rebates</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-black text-[9px] uppercase tracking-[0.2em] text-blue-500 mb-6 pl-3 border-l-2 border-blue-600">Contact</h4>
-              <div className="p-4 bg-white/5 rounded-xl border border-white/5 hover:border-blue-600 transition-all">
-                <div className="text-[9px] font-black uppercase text-blue-500 mb-1">Partner Support</div>
-                <div className="text-base font-black text-white">1-888-PEEL-AI</div>
-              </div>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex gap-6 grayscale opacity-20 text-[8px] font-black uppercase">
-               <span>TSSA Certified</span>
-               <span>HRAI Member</span>
-            </div>
-            <div className="text-[9px] font-black uppercase tracking-widest text-slate-700">
-              © 2026 Peel AI Systems • <a href="#" className="hover:text-white">Privacy</a>
-            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">HVAC Automation Excellence</p>
           </div>
         </div>
       </footer>
-      <LiveChatWidget />
     </div>
   );
 };

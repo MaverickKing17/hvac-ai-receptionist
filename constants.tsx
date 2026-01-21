@@ -2,78 +2,65 @@
 import { AppConfig } from './types';
 
 export const CONFIG: AppConfig = {
-  companyName: "Peel AI Receptionist",
-  logoUrl: "https://picsum.photos/200/60?random=1",
-  primaryColor: "#1E40AF", // Blue
-  secondaryColor: "#F97316", // Orange
-  accentColor: "#0D9488", // Teal
-  heroTagline: "24/7 AI Receptionist + Custom Website for GTA HVAC Pros",
-  heroSubheadline: "Never miss a no-heat call again. Melissa, your AI receptionist, answers, qualifies, and books calls instantly while you're on-site.",
-  emergencyPhone: "416-555-0199",
+  companyName: "ServiceVoice AI",
+  logoUrl: "https://picsum.photos/200/60?random=10",
+  primaryColor: "#0284c7", // HVAC Sky Blue
+  secondaryColor: "#0f172a", // Deep Slate
+  accentColor: "#f97316", // Energy Orange
+  heroTagline: "The AI Receptionist Your HVAC Brand Deserves.",
+  heroSubheadline: "White-label AI voice agents that book installs, handle emergency dispatch, and pre-qualify $10k government rebates while you sleep. Built for the 2026 HVAC industry.",
+  emergencyPhone: "1-888-HVAC-AI-1",
   rebateAmount: "$10,500",
   guarantees: [
-    "Certified Technicians",
-    "24/7 Emergency Support",
-    "Upfront Honest Pricing",
-    "Local GTA Experts"
+    "100% White-Label Branding",
+    "ServiceTitan & Jobber Sync",
+    "Dual-Agent (Chloe & Sam)",
+    "Custom Voice Training"
   ],
-  serviceAreas: ["Toronto", "Mississauga", "Brampton", "Vaughan", "Markham", "Oakville"],
+  serviceAreas: ["Toronto", "GTA", "Vancouver", "Calgary", "Ottawa", "Montreal"],
   pricing: [
     {
-      name: "Starter Site",
-      price: "$299/mo",
-      description: "Perfect for solo contractors needing a professional presence.",
+      name: "Contractor",
+      price: "$399/mo",
+      description: "Perfect for owner-operators needing a digital voice.",
       features: [
-        "Custom Brand Website",
-        "Mobile-First Design",
-        "SEO Optimization",
-        "Lead Capture Forms",
-        "Standard Hosting"
+        "1 Custom AI Agent",
+        "Lead Capture via Webhook",
+        "SMS Notifications",
+        "Basic Analytics Dashboard"
       ]
     },
     {
-      name: "Pro AI Voice",
-      price: "$599/mo",
-      description: "Our most popular plan for growth-focused businesses.",
+      name: "Fleet Pro",
+      price: "$799/mo",
+      description: "Scale your multi-truck operation with precision.",
       features: [
-        "Everything in Starter",
-        "24/7 AI Voice Receptionist",
-        "Live Calendar Booking",
-        "SMS Lead Alerts",
-        "Rebate Optimizer Tool"
+        "Chloe & Sam Dual-Agents",
+        "Full CRM Integration",
+        "Live Calendar Sync",
+        "Automatic Rebate Qualifier",
+        "Priority 4hr Dispatch Logic"
       ],
       popular: true
     },
     {
-      name: "Premium SaaS",
-      price: "$999/mo",
-      description: "Full automation for large fleets and franchises.",
+      name: "Enterprise",
+      price: "Custom",
+      description: "Dedicated infrastructure for multi-location giants.",
       features: [
-        "Everything in Pro",
-        "Multi-Agent Support",
-        "CRM Integration",
-        "Advanced Analytics",
-        "Priority 24/7 Tech Support"
+        "Unlimited White-Label Agents",
+        "Multi-Region Dispatching",
+        "Dedicated Account Manager",
+        "Custom LLM Fine-tuning",
+        "On-premise Data Hosting"
       ]
     }
   ],
   testimonials: [
     {
-      name: "Dave Miller",
-      location: "Miller Heating & Air, Brampton",
-      text: "Since adding Melissa to our calls, we've booked 30% more jobs that would have gone to voicemail. It paid for itself in two days.",
-      rating: 5
-    },
-    {
-      name: "Sarah Chen",
-      location: "Chen HVAC Services, Toronto",
-      text: "The website is sleek, but the AI voice is the real hero. It handles my midnight no-heat calls while I sleep. Incredible tech.",
-      rating: 5
-    },
-    {
-      name: "Mark Thompson",
-      location: "Thompson Cooling, Mississauga",
-      text: "Best investment I made for my business this year. Clients are blown away when they 'talk' to our AI and get booked instantly.",
+      name: "Mark T.",
+      location: "Toronto HVAC Group",
+      text: "We switched our entire dispatch to ServiceVoice. We stopped losing $2k furnace leads at 3 AM. The white-labeling is seamless.",
       rating: 5
     }
   ]
