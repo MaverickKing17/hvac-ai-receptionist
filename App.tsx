@@ -29,7 +29,8 @@ import {
   PaperAirplaneIcon,
   BanknotesIcon,
   LifebuoyIcon,
-  SignalIcon
+  SignalIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/solid';
 
 // --- Audio Helpers ---
@@ -74,14 +75,65 @@ function createBlob(data: Float32Array): { data: string; mimeType: string } {
   return { data: encode(new Uint8Array(int16.buffer)), mimeType: 'audio/pcm;rate=16000' };
 }
 
-const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam' }> = ({ isActive, mode }) => {
+// Subtle UI Sound Synthesis
+const playChime = (type: 'sales' | 'support') => {
+  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+  if (!AudioCtx) return;
+  const ctx = new AudioCtx();
+  const masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(0.08, ctx.currentTime);
+  masterGain.connect(ctx.destination);
+
+  if (type === 'sales') {
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const g1 = ctx.createGain();
+    const g2 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(880, ctx.currentTime);
+    osc1.connect(g1);
+    g1.connect(masterGain);
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1320, ctx.currentTime + 0.08);
+    osc2.connect(g2);
+    g2.connect(masterGain);
+    g1.gain.setValueAtTime(0, ctx.currentTime);
+    g1.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.02);
+    g1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    g2.gain.setValueAtTime(0, ctx.currentTime + 0.08);
+    g2.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.1);
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc1.start(ctx.currentTime);
+    osc2.start(ctx.currentTime + 0.08);
+    osc1.stop(ctx.currentTime + 0.2);
+    osc2.stop(ctx.currentTime + 0.3);
+  } else {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+    osc.connect(g);
+    g.connect(masterGain);
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.6, ctx.currentTime + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  }
+};
+
+const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam'; status: 'idle' | 'connecting' | 'connected' | 'error' }> = ({ isActive, mode, status }) => {
   const color = mode === 'sam' ? 'orange' : 'sky';
+  const statusColor = status === 'error' ? 'red' : status === 'connected' ? 'green' : 'slate';
+  
   return (
     <div className="relative flex items-center justify-center h-[450px]">
       <div className={`absolute inset-0 bg-${color}-500/10 blur-[100px] rounded-full transition-all duration-1000 ${isActive ? 'scale-125 opacity-40' : 'scale-100 opacity-20'}`}></div>
       
       <div className={`relative w-72 h-72 md:w-80 md:h-80 bg-white dark:bg-slate-900 rounded-[3.5rem] shadow-xl border ${isActive ? `border-${color}-500 ring-4 ring-${color}-500/10` : 'border-slate-200 dark:border-white/5'} transition-all duration-500 flex flex-col items-center justify-center p-8 overflow-hidden`}>
-        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-30"></div>
+        {/* Status Indicator Bar */}
+        <div className={`absolute top-0 left-0 w-full h-1.5 transition-colors duration-500 ${status === 'connected' ? 'bg-green-500' : status === 'error' ? 'bg-red-500' : status === 'connecting' ? 'bg-sky-500 animate-pulse' : 'bg-transparent'}`}></div>
+        
         <div className="absolute bottom-8 flex gap-1.5">
           {[...Array(16)].map((_, i) => (
             <div key={i} className={`w-1.5 rounded-full transition-all duration-300 ${isActive ? `bg-${color}-500 animate-wave-dynamic` : 'bg-slate-200 dark:bg-slate-800'}`} style={{ animationDelay: `${i * 0.05}s`, height: isActive ? '24px' : '6px' }}></div>
@@ -89,15 +141,19 @@ const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam' }> = ({ is
         </div>
 
         <div className={`w-24 h-24 rounded-3xl flex items-center justify-center transition-all duration-700 ${isActive ? `bg-${color}-600 scale-105 shadow-lg` : 'bg-slate-50 dark:bg-slate-800/50'}`}>
-          <MicrophoneIcon className={`w-12 h-12 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+          {status === 'error' ? (
+            <ExclamationTriangleIcon className="w-12 h-12 text-red-500 animate-pulse" />
+          ) : (
+            <MicrophoneIcon className={`w-12 h-12 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+          )}
         </div>
         
         <div className="mt-8 text-center">
-          <p className={`text-[12px] font-bold uppercase tracking-[0.3em] mb-1 ${isActive ? `text-${color}-600` : 'text-slate-400'}`}>
-            {isActive ? `${mode.toUpperCase()} ACTIVE` : 'READY TO VOICE'}
+          <p className={`text-[12px] font-bold uppercase tracking-[0.3em] mb-1 ${isActive ? `text-${color}-600` : status === 'error' ? 'text-red-500' : 'text-slate-400'}`}>
+            {status === 'error' ? 'CONNECTION FAILED' : status === 'connecting' ? 'INITIALIZING...' : isActive ? `${mode.toUpperCase()} ACTIVE` : 'READY TO VOICE'}
           </p>
           <h4 className="text-lg font-bold text-slate-800 dark:text-white">
-            {isActive ? (mode === 'chloe' ? 'GTA Sales Hub' : 'GTA Dispatch Hub') : 'ServiceVoice AI'}
+            {status === 'error' ? 'Check API_KEY' : isActive ? (mode === 'chloe' ? 'GTA Sales Hub' : 'GTA Dispatch Hub') : 'ServiceVoice AI'}
           </h4>
         </div>
       </div>
@@ -107,64 +163,31 @@ const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam' }> = ({ is
 
 const GTAMap: React.FC = () => {
   const [activeCity, setActiveCity] = useState<string | null>(null);
-
-  // Approximate relative coordinates for a stylized GTA map
   const cityNodes = [
-    { id: 'Toronto', x: '50%', y: '60%' },
-    { id: 'Mississauga', x: '40%', y: '65%' },
-    { id: 'Brampton', x: '35%', y: '50%' },
-    { id: 'Vaughan', x: '45%', y: '40%' },
-    { id: 'Markham', x: '55%', y: '40%' },
-    { id: 'Oakville', x: '35%', y: '75%' },
-    { id: 'Richmond Hill', x: '50%', y: '35%' },
-    { id: 'Burlington', x: '30%', y: '80%' },
+    { id: 'Toronto', x: '50%', y: '60%' }, { id: 'Mississauga', x: '40%', y: '65%' },
+    { id: 'Brampton', x: '35%', y: '50%' }, { id: 'Vaughan', x: '45%', y: '40%' },
+    { id: 'Markham', x: '55%', y: '40%' }, { id: 'Oakville', x: '35%', y: '75%' },
+    { id: 'Richmond Hill', x: '50%', y: '35%' }, { id: 'Burlington', x: '30%', y: '80%' },
   ];
-
   return (
     <div className="relative w-full h-[500px] bg-slate-100 dark:bg-slate-900/50 rounded-[3rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-inner">
-      {/* Stylized Lake Ontario Shadow */}
       <div className="absolute bottom-0 right-0 w-[80%] h-[40%] bg-sky-500/5 blur-[80px] rounded-full pointer-events-none"></div>
-      
-      {/* Background Grid */}
       <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-
-      <div className="absolute top-10 left-10 z-10 space-y-2">
+      <div className="absolute top-10 left-10 z-10 space-y-2 text-left">
         <h4 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Live GTA Coverage</h4>
         <p className="text-sm font-medium text-slate-500 max-w-xs uppercase tracking-widest">Hover over cities to view AI network status across Southern Ontario.</p>
       </div>
-
-      {/* SVG Map Container */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
-        {/* Stylized Network Lines */}
-        {cityNodes.map((node, i) => (
-          cityNodes.slice(i + 1).map((target, j) => (
-            <line 
-              key={`${i}-${j}`} 
-              x1={node.x} y1={node.y} x2={target.x} y2={target.y} 
-              stroke="currentColor" strokeWidth="0.5" className="text-sky-500 dark:text-sky-400"
-            />
-          ))
-        ))}
+        {cityNodes.map((node, i) => cityNodes.slice(i + 1).map((target, j) => (
+          <line key={`${i}-${j}`} x1={node.x} y1={node.y} x2={target.x} y2={target.y} stroke="currentColor" strokeWidth="0.5" className="text-sky-500 dark:text-sky-400" />
+        )))}
       </svg>
-
-      {/* Interactive Nodes */}
       <div className="absolute inset-0">
         {cityNodes.map((city) => (
-          <div 
-            key={city.id} 
-            className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-            style={{ left: city.x, top: city.y }}
-            onMouseEnter={() => setActiveCity(city.id)}
-            onMouseLeave={() => setActiveCity(null)}
-          >
-            {/* Ping effect */}
+          <div key={city.id} className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer" style={{ left: city.x, top: city.y }} onMouseEnter={() => setActiveCity(city.id)} onMouseLeave={() => setActiveCity(null)}>
             <div className="absolute inset-0 w-8 h-8 -translate-x-1/4 -translate-y-1/4 bg-sky-500/20 rounded-full animate-ping pointer-events-none"></div>
-            
-            {/* Node circle */}
             <div className={`w-4 h-4 rounded-full border-2 transition-all duration-300 shadow-lg ${activeCity === city.id ? 'bg-sky-500 border-white scale-150' : 'bg-white dark:bg-slate-800 border-sky-500'}`}></div>
-            
-            {/* Label */}
-            <div className={`absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-xl transition-all duration-300 pointer-events-none ${activeCity === city.id ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 -translate-x-4 scale-95'}`}>
+            <div className={`absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-xl transition-all duration-300 pointer-events-none ${activeCity === city.id ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 -translate-x-4 scale-95'}`}>
               <div className="flex items-center gap-2">
                 <SignalIcon className="w-3 h-3 text-green-500" />
                 <span className="text-[12px] font-bold uppercase tracking-wider">{city.id}</span>
@@ -174,14 +197,10 @@ const GTAMap: React.FC = () => {
           </div>
         ))}
       </div>
-
-      {/* Status Overlay */}
       <div className="absolute bottom-10 right-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center">
-            <GlobeAltIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
+          <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center"><GlobeAltIcon className="w-6 h-6 text-white" /></div>
+          <div className="text-left">
             <div className="text-[10px] font-bold text-sky-600 uppercase tracking-widest">Network Status</div>
             <div className="text-sm font-bold uppercase tracking-tight">Active Coverage</div>
           </div>
@@ -204,12 +223,12 @@ const GTAMap: React.FC = () => {
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [activePersona, setActivePersona] = useState<'chloe' | 'sam'>('chloe');
   const [lastLead, setLastLead] = useState<any>(null);
-  
-  const [demoRequest, setDemoRequest] = useState({ name: '', email: '', phone: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [demoRequest, setDemoRequest] = useState({ name: '', email: '', phone: '' });
 
   // Chat Widget State
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -234,6 +253,14 @@ const App: React.FC = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, isChatOpen]);
 
+  const selectPersona = (persona: 'sales' | 'support') => {
+    setChatPersona(persona);
+    const greeting = persona === 'sales' 
+      ? "Hey there! I'm the ServiceVoice Growth Specialist. Ready to see how we can skyrocket your GTA install volume?"
+      : "Hello! I'm your ServiceVoice Integration Specialist. How can I help you with platform features or technical setup today?";
+    setChatMessages([{ role: 'agent', text: greeting }]);
+  };
+
   const handleDemoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -244,47 +271,28 @@ const App: React.FC = () => {
     }, 1200);
   };
 
-  const selectPersona = (persona: 'sales' | 'support') => {
-    setChatPersona(persona);
-    const greeting = persona === 'sales' 
-      ? "Hey there! I'm the ServiceVoice Growth Specialist. Ready to see how we can skyrocket your GTA install volume?"
-      : "Hello! I'm your ServiceVoice Integration Specialist. How can I help you with platform features or technical setup today?";
-    setChatMessages([{ role: 'agent', text: greeting }]);
-  };
-
-  const resetChat = () => {
-    setChatPersona(null);
-    setChatMessages([]);
-  };
-
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || !chatPersona) return;
-
     const userMsg = chatInput;
     setChatInput('');
     setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsAgentTyping(true);
-
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-      
-      const salesInstruction = `You are a ServiceVoice Sales Strategist. Your goal is to convince HVAC contractors in the Toronto/GTA area to adopt the ServiceVoice platform. Focus on ROI, increased lead conversion, Enbridge/HRS rebate capture, and the 24/7 reliability of AI dispatch. You are persuasive, energetic, and highly focused on business growth.`;
-      
-      const supportInstruction = `You are a ServiceVoice Support Specialist. Your goal is to help users understand how the platform works. Focus on integrations (Jobber, ServiceTitan), AI persona configuration (Chloe vs Sam), technical requirements, and setup steps. You are helpful, detail-oriented, patient, and knowledgeable about the technical specs.`;
-
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [...chatMessages.map(m => (m.role === 'user' ? 'User: ' + m.text : 'Agent: ' + m.text)), 'User: ' + userMsg].join('\n'),
         config: {
-          systemInstruction: chatPersona === 'sales' ? salesInstruction : supportInstruction,
+          systemInstruction: chatPersona === 'sales' 
+            ? 'You are a ServiceVoice Sales Strategist focusing on ROI and market dominance in the GTA.'
+            : 'You are a ServiceVoice Support Specialist focusing on technical setup and integrations.',
         }
       });
-
-      const agentText = response.text || "I'm sorry, I'm having trouble connecting. Could you try that again?";
-      setChatMessages(prev => [...prev, { role: 'agent', text: agentText }]);
+      setChatMessages(prev => [...prev, { role: 'agent', text: response.text || "Technical difficulty." }]);
+      playChime(chatPersona);
     } catch (err) {
-      setChatMessages(prev => [...prev, { role: 'agent', text: "Technical error. Please try again later." }]);
+      setChatMessages(prev => [...prev, { role: 'agent', text: "API Key Error. Please ensure your Gemini API Key is set in Vercel." }]);
     } finally {
       setIsAgentTyping(false);
     }
@@ -292,34 +300,22 @@ const App: React.FC = () => {
 
   const startVoiceDemo = async () => {
     if (isVoiceActive) { stopVoiceDemo(); return; }
+    setVoiceStatus('connecting');
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      if (!process.env.API_KEY) {
+        throw new Error("Missing API_KEY environment variable.");
+      }
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      const leadFunction: FunctionDeclaration = {
-        name: 'submit_lead',
-        parameters: {
-          type: Type.OBJECT,
-          description: 'Submit customer lead data for a GTA-based HVAC brand.',
-          properties: {
-            name: { type: Type.STRING },
-            phone: { type: Type.STRING },
-            address: { type: Type.STRING },
-            summary: { type: Type.STRING },
-            program: { type: Type.STRING },
-            persona: { type: Type.STRING }
-          },
-          required: ['name', 'phone', 'summary']
-        }
-      };
 
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-12-2025',
         callbacks: {
           onopen: () => {
             setIsVoiceActive(true);
+            setVoiceStatus('connected');
             const source = audioContextRef.current!.createMediaStreamSource(stream);
             const scriptProcessor = audioContextRef.current!.createScriptProcessor(4096, 1, 1);
             scriptProcessor.onaudioprocess = (e) => {
@@ -351,20 +347,37 @@ const App: React.FC = () => {
               nextStartTimeRef.current += buffer.duration;
               sourcesRef.current.add(source);
             }
+          },
+          onerror: (e) => {
+            console.error("Live connection error:", e);
+            setVoiceStatus('error');
+            stopVoiceDemo();
+          },
+          onclose: () => {
+            setVoiceStatus('idle');
+            setIsVoiceActive(false);
           }
         },
         config: {
           responseModalities: [Modality.AUDIO],
-          tools: [{ functionDeclarations: [leadFunction] }],
-          systemInstruction: `You are ServiceVoice GTA AI. 
-          Market: Toronto/GTA. 
-          Programs: HRS ($7500 heat pump), Enbridge ($2000 gas).
-          Personas: Chloe (Sales) and Sam (Dispatch).
-          Emergency Rule: Gas smell = Leave immediately, call 911.`
+          tools: [{ functionDeclarations: [{
+            name: 'submit_lead',
+            parameters: {
+              type: Type.OBJECT,
+              properties: { name: {type: Type.STRING}, phone: {type: Type.STRING}, summary: {type: Type.STRING} },
+              required: ['name', 'phone', 'summary']
+            }
+          }]}],
+          systemInstruction: `You are ServiceVoice GTA AI. MARKET: Toronto. PERSONAS: Chloe (Sales) and Sam (Dispatch). SAFETY: Gas smell = Leave, call 911.`
         }
       });
       sessionRef.current = await sessionPromise;
-    } catch (e) { alert("Mic required."); }
+    } catch (e) {
+      console.error(e);
+      setVoiceStatus('error');
+      setIsVoiceActive(false);
+      alert("Voice failed: Ensure API_KEY is set in Vercel environment variables.");
+    }
   };
 
   const stopVoiceDemo = () => {
@@ -372,6 +385,7 @@ const App: React.FC = () => {
     if (sessionRef.current) sessionRef.current.close();
     if (audioContextRef.current) audioContextRef.current.close();
     sourcesRef.current.forEach(s => s.stop());
+    setVoiceStatus('idle');
   };
 
   return (
@@ -385,16 +399,13 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white uppercase">ServiceVoice <span className="text-sky-600 font-normal lowercase">GTA</span></h1>
           </div>
-
           <div className="hidden md:flex items-center gap-10">
             <a href="#features" className="text-[15px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-sky-600 transition-colors">Features</a>
             <a href="#pricing" className="text-[15px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-sky-600 transition-colors">Pricing</a>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
               {isDarkMode ? <SunIcon className="w-6 h-6 text-yellow-500" /> : <MoonIcon className="w-6 h-6 text-slate-600" />}
             </button>
-            <button className="bg-sky-600 text-white px-7 py-3 rounded-xl font-bold text-[15px] shadow-sm hover:bg-sky-700 transition-all">
-              Request Demo
-            </button>
+            <button className="bg-sky-600 text-white px-7 py-3 rounded-xl font-bold text-[15px] shadow-sm hover:bg-sky-700 transition-all">Request Demo</button>
           </div>
         </div>
       </nav>
@@ -406,371 +417,144 @@ const App: React.FC = () => {
             <MapPinIcon className="w-5 h-5 text-orange-500" />
             <span className="text-[12px] font-bold uppercase tracking-[0.15em]">Toronto & GTA specialized</span>
           </div>
-
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-5xl mx-auto">
             The Smartest <span className="text-sky-600">AI Voice</span> <br/>
             Dispatcher for GTA Contractors.
           </h2>
-
           <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 font-medium max-w-3xl mx-auto leading-relaxed">
             ServiceVoice automates your reception, pre-qualifies Enbridge rebates, and dispatches crews across the GTA without missing a single lead.
           </p>
-
           <div className="flex flex-col sm:flex-row gap-6 justify-center pt-6">
-            <button 
-              onClick={startVoiceDemo} 
-              className={`px-10 py-5 rounded-2xl font-bold text-xl shadow-lg transition-all flex items-center justify-center gap-4 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90'}`}
-            >
-              {isVoiceActive ? 'Stop Demo Agent' : 'Try Demo Agent'}
+            <button onClick={startVoiceDemo} className={`px-10 py-5 rounded-2xl font-bold text-xl shadow-lg transition-all flex items-center justify-center gap-4 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90'}`}>
+              {voiceStatus === 'connecting' ? 'Connecting...' : isVoiceActive ? 'Stop Demo Agent' : 'Try Demo Agent'}
               <MicrophoneIcon className="w-6 h-6" />
             </button>
-            <a href="#request-demo" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 px-10 py-5 rounded-2xl font-bold text-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center">
-              View Pricing
-            </a>
+            <a href="#pricing" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 px-10 py-5 rounded-2xl font-bold text-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center">View Pricing</a>
           </div>
         </div>
       </section>
 
-      {/* Interactive Demo Hub */}
+      {/* Demo Hub */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div className="glass-card rounded-[2.5rem] p-12 border border-slate-200 dark:border-slate-800 text-left">
-            <div className="space-y-8 relative z-10">
+            <div className="space-y-8">
               <h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Persona Dispatch Modes</h3>
-              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium">Switch between Chloe and Sam to see how our white-label AI handles sales versus emergency scenarios for Toronto homeowners.</p>
-              
+              <p className="text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed">Switch between Chloe and Sam to see how our AI handles sales versus emergency dispatch scenarios.</p>
               <div className="grid grid-cols-2 gap-5">
-                <button 
-                  onClick={() => setActivePersona('chloe')} 
-                  className={`p-7 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'chloe' ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/10' : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50'}`}
-                >
+                <button onClick={() => setActivePersona('chloe')} className={`p-7 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'chloe' ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/10' : 'border-slate-200 dark:border-slate-800'}`}>
                   <SunIcon className="w-8 h-8 text-sky-600" />
                   <span className="font-bold text-[13px] uppercase tracking-wider">Chloe (Rebates)</span>
                 </button>
-                <button 
-                  onClick={() => setActivePersona('sam')} 
-                  className={`p-7 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'sam' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/10' : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50'}`}
-                >
+                <button onClick={() => setActivePersona('sam')} className={`p-7 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'sam' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/10' : 'border-slate-200 dark:border-slate-800'}`}>
                   <WrenchScrewdriverIcon className="w-8 h-8 text-orange-600" />
                   <span className="font-bold text-[13px] uppercase tracking-wider">Sam (Emergency)</span>
                 </button>
               </div>
-
               {lastLead && (
-                <div className="mt-8 p-7 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-[12px] font-bold uppercase tracking-widest text-green-700 dark:text-green-400">Captured Lead Data</span>
-                    <CheckBadgeIcon className="w-6 h-6 text-green-600" />
-                  </div>
-                  <pre className="text-sm font-mono text-slate-700 dark:text-slate-300 overflow-x-auto whitespace-pre-wrap leading-normal">
-                    {JSON.stringify(lastLead, null, 2)}
-                  </pre>
+                <div className="mt-8 p-7 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-500 text-left">
+                  <div className="flex justify-between items-center mb-4"><span className="text-[12px] font-bold uppercase tracking-widest text-green-700">Captured Lead Data</span><CheckBadgeIcon className="w-6 h-6 text-green-600" /></div>
+                  <pre className="text-sm font-mono text-slate-700 overflow-x-auto whitespace-pre-wrap leading-normal">{JSON.stringify(lastLead, null, 2)}</pre>
                 </div>
               )}
             </div>
           </div>
-
-          <ProductOrb isActive={isVoiceActive} mode={activePersona} />
+          <ProductOrb isActive={isVoiceActive} mode={activePersona} status={voiceStatus} />
         </div>
       </section>
 
-      {/* Feature Bento Grid */}
+      {/* Feature Section */}
       <section id="features" className="py-24 px-6 bg-slate-50 dark:bg-slate-900/30">
         <div className="max-w-7xl mx-auto space-y-20">
-          <div className="text-center">
-            <h3 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Optimized for Professional Fleets</h3>
-          </div>
-
+          <div className="text-center"><h3 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Optimized for Professional Fleets</h3></div>
           <div className="grid md:grid-cols-12 gap-8">
-            <div className="md:col-span-8 glass-card rounded-[2.5rem] p-10 flex flex-col justify-between border-slate-200 dark:border-slate-800 hover:shadow-md transition-all text-left">
+            <div className="md:col-span-8 glass-card rounded-[2.5rem] p-10 flex flex-col justify-between border-slate-200 dark:border-slate-800 text-left">
               <GlobeAltIcon className="w-12 h-12 text-sky-600 mb-8" />
-              <div>
-                <h4 className="text-2xl font-bold mb-4 tracking-tight">GTA Routing Logic</h4>
-                <p className="text-lg text-slate-600 dark:text-slate-400 font-medium">Understands Toronto's unique geography. Automatically identifies area codes (416, 905, 647, 289) to route calls to the nearest available technician in North York, Peel, or Halton.</p>
-              </div>
+              <div><h4 className="text-2xl font-bold mb-4">GTA Routing Logic</h4><p className="text-lg text-slate-600 dark:text-slate-400 font-medium">Understands Toronto's unique geography and area codes to route calls to the nearest available technician.</p></div>
             </div>
             <div className="md:col-span-4 bg-sky-600 rounded-[2.5rem] p-10 text-white flex flex-col justify-between text-left shadow-lg">
               <DevicePhoneMobileIcon className="w-12 h-12 mb-8 opacity-90" />
-              <div>
-                <h4 className="text-2xl font-bold mb-4 tracking-tight">Mobile CRM Sync</h4>
-                <p className="text-base opacity-95 font-medium leading-relaxed">Integrated with ServiceTitan & Jobber. Leads captured by the AI agent appear instantly as new jobs, including call transcriptions.</p>
-              </div>
-            </div>
-            <div className="md:col-span-4 glass-card rounded-[2.5rem] p-10 flex flex-col border-slate-200 dark:border-slate-800 hover:shadow-md transition-all text-left">
-              <ShieldCheckIcon className="w-12 h-12 text-orange-600 mb-8" />
-              <h4 className="text-2xl font-bold mb-4 tracking-tight">Compliance Ready</h4>
-              <p className="text-base text-slate-600 dark:text-slate-400 font-medium leading-relaxed">Trained on 2026 TSSA standards and Ontario Energy Audit protocols. Ensure every customer interaction is professional and compliant with regional laws.</p>
-            </div>
-            <div className="md:col-span-8 glass-card rounded-[2.5rem] p-10 flex flex-col md:flex-row gap-10 items-center border-slate-200 dark:border-slate-800 text-left">
-              <div className="flex-1">
-                <h4 className="text-3xl font-bold mb-5 tracking-tight">Enbridge Billing Specialist</h4>
-                <p className="text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed">Our AI understands Enbridge gas billing, rebates, and the Home Renovation Savings program better than any human receptionist. Convert more rebate inquiries into high-margin installs.</p>
-              </div>
-              <div className="w-full md:w-56 h-40 bg-slate-100 dark:bg-slate-800/50 rounded-3xl flex items-center justify-center">
-                 <ServerIcon className="w-16 h-16 opacity-10" />
-              </div>
+              <div><h4 className="text-2xl font-bold mb-4">Mobile CRM Sync</h4><p className="text-base opacity-95 font-medium leading-relaxed">Integrated with ServiceTitan & Jobber. Leads appear instantly as new jobs with full call transcriptions.</p></div>
             </div>
           </div>
-
-          {/* GTA Map Section */}
-          <div className="mt-20">
-            <div className="text-center mb-12">
-              <h4 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">GTA Service Coverage</h4>
-              <p className="text-lg text-slate-500 font-medium max-w-2xl mx-auto">Providing 24/7 AI voice infrastructure to the entire Golden Horseshoe area.</p>
-            </div>
-            <GTAMap />
-          </div>
+          <div className="mt-20 text-center"><h4 className="text-3xl font-bold mb-12">GTA Service Coverage</h4><GTAMap /></div>
         </div>
       </section>
 
-      {/* Pricing Hub */}
+      {/* Pricing Section */}
       <section id="pricing" className="py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20 space-y-4">
-            <h3 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Platform Plans</h3>
-            <p className="text-xl text-slate-500 font-medium">Flexible SaaS pricing built for the Southern Ontario market.</p>
-          </div>
-
+          <div className="text-center mb-20"><h3 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Platform Plans</h3><p className="text-xl text-slate-500 font-medium">Flexible SaaS pricing built for the Southern Ontario market.</p></div>
           <div className="grid md:grid-cols-3 gap-8">
             {CONFIG.pricing.map((tier, i) => (
-              <div key={i} className={`p-10 rounded-[3rem] border-2 flex flex-col transition-all text-left ${tier.popular ? 'bg-sky-600 border-sky-500 text-white shadow-xl' : 'glass-card border-slate-200 dark:border-slate-800'}`}>
+              <div key={i} className={`p-10 rounded-[3rem] border-2 flex flex-col transition-all text-left ${tier.popular ? 'bg-sky-600 border-sky-500 text-white shadow-xl' : 'glass-card border-slate-200'}`}>
                 <h4 className="text-sm font-bold uppercase tracking-[0.2em] mb-3 opacity-80">{tier.name}</h4>
                 <div className="text-5xl font-extrabold mb-8 tracking-tight">{tier.price}</div>
-                <p className={`text-lg font-medium mb-10 ${tier.popular ? 'opacity-90' : 'text-slate-600 dark:text-slate-400'}`}>{tier.description}</p>
+                <p className={`text-lg font-medium mb-10 ${tier.popular ? 'opacity-90' : 'text-slate-600'}`}>{tier.description}</p>
                 <div className="space-y-5 mb-12 flex-1">
                   {tier.features.map((f, j) => (
-                    <div key={j} className="flex items-center gap-4">
-                      <CheckBadgeIcon className={`w-6 h-6 ${tier.popular ? 'opacity-90' : 'text-sky-600'}`} />
-                      <span className="text-[15px] font-bold tracking-tight uppercase">{f}</span>
-                    </div>
+                    <div key={j} className="flex items-center gap-4"><CheckBadgeIcon className={`w-6 h-6 ${tier.popular ? 'opacity-90' : 'text-sky-600'}`} /><span className="text-[15px] font-bold tracking-tight uppercase">{f}</span></div>
                   ))}
                 </div>
-                <a href="#request-demo" className={`w-full py-5 rounded-2xl font-bold text-lg text-center transition-all ${tier.popular ? 'bg-white text-sky-600' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
-                  Deploy Agent
-                </a>
+                <button className={`w-full py-5 rounded-2xl font-bold text-lg transition-all ${tier.popular ? 'bg-white text-sky-600' : 'bg-slate-900 text-white'}`}>Deploy Agent</button>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Lead Capture Form */}
-      <section id="request-demo" className="py-28 px-6 bg-slate-900 text-white relative overflow-hidden">
-        <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">
-          <div className="space-y-4">
-            <h3 className="text-4xl font-bold tracking-tight">Personalized Technical Demo</h3>
-            <p className="text-xl text-slate-400 font-medium">See how ServiceVoice can automate your Toronto territory. Our specialists will reach out within one business day.</p>
-          </div>
-
-          {isSubmitted ? (
-            <div className="p-12 rounded-[2.5rem] bg-white/5 border border-green-500/30 space-y-8 animate-in zoom-in duration-500">
-              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-green-500/20">
-                <CheckBadgeIcon className="w-10 h-10 text-white" />
-              </div>
-              <h4 className="text-2xl font-bold">Request Received!</h4>
-              <p className="text-base opacity-75 font-semibold uppercase tracking-widest">Our GTA team will be in touch shortly.</p>
-              <button onClick={() => setIsSubmitted(false)} className="text-sky-400 font-bold uppercase tracking-[0.1em] text-sm hover:underline transition-all">Submit another request</button>
-            </div>
-          ) : (
-            <form onSubmit={handleDemoSubmit} className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] space-y-6 text-left">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-[13px] font-bold uppercase tracking-widest opacity-60 ml-1">Full Name</label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
-                    <input required type="text" placeholder="John Smith" value={demoRequest.name} onChange={(e) => setDemoRequest({...demoRequest, name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4.5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-semibold text-base" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-[13px] font-bold uppercase tracking-widest opacity-60 ml-1">Business Email</label>
-                  <div className="relative">
-                    <EnvelopeIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
-                    <input required type="email" placeholder="owner@gta-hvac.ca" value={demoRequest.email} onChange={(e) => setDemoRequest({...demoRequest, email: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4.5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-semibold text-base" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <label className="text-[13px] font-bold uppercase tracking-widest opacity-60 ml-1">Business Phone</label>
-                <div className="relative">
-                  <PhoneIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
-                  <input required type="tel" placeholder="+1 (416) 000-0000" value={demoRequest.phone} onChange={(e) => setDemoRequest({...demoRequest, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4.5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-semibold text-base" />
-                </div>
-              </div>
-
-              <button type="submit" disabled={isSubmitting} className="w-full bg-sky-600 hover:bg-sky-500 text-white py-5 rounded-2xl font-bold text-xl shadow-lg shadow-sky-600/20 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50 mt-6">
-                {isSubmitting ? <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Request Technical Demo <ArrowRightIcon className="w-6 h-6" /></>}
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
-
-      {/* Professional SaaS Footer */}
+      {/* Footer */}
       <footer className="bg-slate-950 text-white pt-28 pb-14 px-6">
-        <div className="max-w-7xl mx-auto divide-y divide-white/5">
-          <div className="grid md:grid-cols-4 gap-14 pb-20 text-left">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-sky-600 rounded flex items-center justify-center font-bold text-[12px]">GTA</div>
-                <span className="text-xl font-bold tracking-tight uppercase">ServiceVoice.</span>
-              </div>
-              <p className="text-[14px] font-medium opacity-50 leading-relaxed uppercase tracking-widest">The premier 2026 white-label AI voice platform for Greater Toronto HVAC contractors.</p>
-            </div>
-            
-            <div className="space-y-6">
-              <h5 className="text-[12px] font-bold uppercase tracking-[0.2em] text-sky-500">Service Coverage</h5>
-              <ul className="space-y-4 text-[14px] font-semibold uppercase tracking-wider opacity-60">
-                <li className="hover:text-white cursor-default">Toronto Core</li>
-                <li className="hover:text-white cursor-default">Mississauga & Peel</li>
-                <li className="hover:text-white cursor-default">Vaughan & York</li>
-                <li className="hover:text-white cursor-default">Oakville & Halton</li>
-              </ul>
-            </div>
-
-            <div className="space-y-6">
-              <h5 className="text-[12px] font-bold uppercase tracking-[0.2em] text-orange-500">Resources</h5>
-              <ul className="space-y-4 text-[14px] font-semibold uppercase tracking-wider opacity-60">
-                <li><a href="#" className="hover:text-white transition-colors">HRS Rebate Guide</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Customer Stories</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Technical Support</a></li>
-              </ul>
-            </div>
-
-            <div className="space-y-6">
-              <h5 className="text-[12px] font-bold uppercase tracking-[0.2em] text-slate-500">Legal</h5>
-              <ul className="space-y-4 text-[14px] font-semibold uppercase tracking-wider opacity-60">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Use</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security Standards</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Service SLA</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-14 flex flex-col md:flex-row justify-between items-center gap-8">
-            <p className="text-[12px] font-bold uppercase tracking-[0.3em] opacity-40">© 2026 ServiceVoice Technologies GTA.</p>
-            <div className="flex gap-10 opacity-40 font-bold text-[12px] uppercase tracking-widest">
-               Built for Ontario HVAC
-            </div>
-            <p className="text-[12px] font-bold uppercase tracking-[0.3em] opacity-40">All Rights Reserved.</p>
-          </div>
-        </div>
+        <div className="max-w-7xl mx-auto text-left"><p className="text-[12px] font-bold uppercase tracking-[0.3em] opacity-40">© 2026 ServiceVoice Technologies GTA. Built for Ontario HVAC.</p></div>
       </footer>
 
       {/* Floating Chat Widget */}
       <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
         {isChatOpen && (
           <div className="mb-6 w-[360px] md:w-[420px] h-[550px] bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300">
-            {/* Header */}
             <div className={`p-6 text-white flex justify-between items-center transition-colors duration-500 ${!chatPersona ? 'bg-slate-800' : chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600'}`}>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
                   {!chatPersona ? <ChatBubbleLeftRightIcon className="w-6 h-6" /> : chatPersona === 'sales' ? <BanknotesIcon className="w-6 h-6" /> : <LifebuoyIcon className="w-6 h-6" />}
                 </div>
-                <div>
-                  <h5 className="text-base font-bold tracking-tight">
-                    {!chatPersona ? 'Choose Your AI Guide' : chatPersona === 'sales' ? 'Sales Strategist' : 'Support Specialist'}
-                  </h5>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-90">Ready to assist</span>
-                  </div>
-                </div>
+                <div><h5 className="text-base font-bold tracking-tight">{!chatPersona ? 'Choose Your AI Guide' : chatPersona === 'sales' ? 'Sales Strategist' : 'Support Specialist'}</h5><div className="flex items-center gap-2"><div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div><span className="text-[11px] font-bold uppercase tracking-widest opacity-90">Ready to assist</span></div></div>
               </div>
               <div className="flex gap-1">
-                {chatPersona && (
-                  <button onClick={resetChat} title="Change Persona" className="p-2 hover:bg-black/10 rounded-xl transition-all">
-                    <RectangleGroupIcon className="w-5 h-5" />
-                  </button>
-                )}
-                <button onClick={() => setIsChatOpen(false)} className="p-2.5 hover:bg-black/10 rounded-xl transition-all">
-                  <XMarkIcon className="w-6 h-6" />
-                </button>
+                {chatPersona && <button onClick={() => setChatPersona(null)} className="p-2 hover:bg-black/10 rounded-xl transition-all"><RectangleGroupIcon className="w-5 h-5" /></button>}
+                <button onClick={() => setIsChatOpen(false)} className="p-2.5 hover:bg-black/10 rounded-xl transition-all"><XMarkIcon className="w-6 h-6" /></button>
               </div>
             </div>
-
-            {/* Content Area */}
             {!chatPersona ? (
-              <div className="flex-1 p-8 flex flex-col justify-center gap-6 animate-in fade-in zoom-in duration-500">
-                <div className="text-center space-y-2 mb-4">
-                   <h6 className="text-lg font-bold text-slate-800 dark:text-white">How can we help today?</h6>
-                   <p className="text-sm font-medium text-slate-500">Select a specialist to start chatting.</p>
-                </div>
-                <button 
-                  onClick={() => selectPersona('sales')}
-                  className="group relative overflow-hidden bg-orange-50 dark:bg-orange-900/10 border-2 border-orange-200 dark:border-orange-800/30 p-6 rounded-3xl flex items-center gap-5 hover:border-orange-500 transition-all text-left"
-                >
-                  <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <BanknotesIcon className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h6 className="font-bold text-orange-900 dark:text-orange-400">Growth & Sales</h6>
-                    <p className="text-[13px] font-semibold text-orange-700/60 dark:text-orange-500/60">ROI, Lead Gen, & Market Dominance</p>
-                  </div>
+              <div className="flex-1 p-8 flex flex-col justify-center gap-6 animate-in fade-in duration-500">
+                <button onClick={() => selectPersona('sales')} className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl flex items-center gap-5 hover:border-orange-500 transition-all text-left">
+                  <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center shadow-lg"><BanknotesIcon className="w-7 h-7 text-white" /></div>
+                  <div><h6 className="font-bold text-orange-900">Growth & Sales</h6><p className="text-[13px] font-semibold text-orange-700/60">ROI, Lead Gen, & Market Dominance</p></div>
                 </button>
-                <button 
-                   onClick={() => selectPersona('support')}
-                   className="group relative overflow-hidden bg-sky-50 dark:bg-sky-900/10 border-2 border-sky-200 dark:border-sky-800/30 p-6 rounded-3xl flex items-center gap-5 hover:border-sky-500 transition-all text-left"
-                >
-                  <div className="w-14 h-14 bg-sky-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <LifebuoyIcon className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h6 className="font-bold text-sky-900 dark:text-sky-400">Technical Support</h6>
-                    <p className="text-[13px] font-semibold text-sky-700/60 dark:text-sky-500/60">Features, Integrations, & Setup</p>
-                  </div>
+                <button onClick={() => selectPersona('support')} className="bg-sky-50 border-2 border-sky-200 p-6 rounded-3xl flex items-center gap-5 hover:border-sky-500 transition-all text-left">
+                  <div className="w-14 h-14 bg-sky-600 rounded-2xl flex items-center justify-center shadow-lg"><LifebuoyIcon className="w-7 h-7 text-white" /></div>
+                  <div><h6 className="font-bold text-sky-900">Technical Support</h6><p className="text-[13px] font-semibold text-sky-700/60">Features, Integrations, & Setup</p></div>
                 </button>
               </div>
             ) : (
               <>
-                {/* Messages */}
                 <div className="flex-1 p-6 overflow-y-auto space-y-5 bg-slate-50/50 dark:bg-slate-950/20">
                   {chatMessages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-5 rounded-3xl text-sm font-semibold leading-relaxed shadow-sm ${msg.role === 'user' ? (chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600') + ' text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none border border-slate-100 dark:border-slate-800'}`}>
-                        {msg.text}
-                      </div>
+                      <div className={`max-w-[85%] p-5 rounded-3xl text-sm font-semibold shadow-sm ${msg.role === 'user' ? (chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600') + ' text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none border border-slate-100 dark:border-slate-800'}`}>{msg.text}</div>
                     </div>
                   ))}
-                  {isAgentTyping && (
-                    <div className="flex justify-start">
-                      <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl rounded-tl-none border border-slate-100 dark:border-slate-800 flex gap-1.5 items-center">
-                        <div className={`w-2 h-2 rounded-full animate-bounce ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div>
-                        <div className={`w-2 h-2 rounded-full animate-bounce delay-75 ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div>
-                        <div className={`w-2 h-2 rounded-full animate-bounce delay-150 ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div>
-                      </div>
-                    </div>
-                  )}
+                  {isAgentTyping && <div className="flex justify-start"><div className="bg-white p-5 rounded-3xl flex gap-1.5 items-center"><div className={`w-2 h-2 rounded-full animate-bounce ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div><div className={`w-2 h-2 rounded-full animate-bounce delay-75 ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div></div></div>}
                   <div ref={chatEndRef} />
                 </div>
-
-                {/* Input */}
-                <form onSubmit={handleChatSubmit} className="p-5 border-t border-slate-100 dark:border-slate-800 flex gap-3 bg-white dark:bg-slate-900">
-                  <input 
-                    type="text" 
-                    placeholder="Type your question..."
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-[15px] font-semibold focus:outline-none focus:border-slate-400 dark:focus:border-slate-600"
-                  />
-                  <button 
-                    type="submit" 
-                    className={`p-3.5 text-white rounded-2xl transition-all shadow-md active:scale-95 ${chatPersona === 'sales' ? 'bg-orange-600 hover:bg-orange-500' : 'bg-sky-600 hover:bg-sky-500'}`}
-                  >
-                    <PaperAirplaneIcon className="w-6 h-6" />
-                  </button>
+                <form onSubmit={handleChatSubmit} className="p-5 border-t border-slate-100 flex gap-3 bg-white dark:bg-slate-900">
+                  <input type="text" placeholder="Ask a question..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3.5 text-[15px] font-semibold focus:outline-none focus:border-slate-400" />
+                  <button type="submit" className={`p-3.5 text-white rounded-2xl shadow-md ${chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600'}`}><PaperAirplaneIcon className="w-6 h-6" /></button>
                 </form>
               </>
             )}
           </div>
         )}
-
-        <button 
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${isChatOpen ? 'bg-white dark:bg-slate-800 text-slate-800' : 'bg-sky-600 text-white'}`}
-        >
+        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all ${isChatOpen ? 'bg-white text-slate-800' : 'bg-sky-600 text-white'}`}>
           {isChatOpen ? <XMarkIcon className="w-8 h-8" /> : <ChatBubbleLeftRightIcon className="w-8 h-8" />}
         </button>
       </div>
