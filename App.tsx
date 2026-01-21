@@ -23,7 +23,8 @@ import {
   SparklesIcon,
   EnvelopeIcon,
   UserIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  MapPinIcon
 } from '@heroicons/react/24/solid';
 
 // --- Audio Helpers ---
@@ -92,7 +93,7 @@ const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam' }> = ({ is
             {isActive ? `${mode.toUpperCase()} ACTIVE` : 'READY TO VOICE'}
           </p>
           <h4 className="text-lg font-black tracking-tight text-slate-800 dark:text-white">
-            {isActive ? (mode === 'chloe' ? 'Rebate Strategy' : 'Dispatch Logic') : 'ServiceVoice AI'}
+            {isActive ? (mode === 'chloe' ? 'GTA Sales Hub' : 'GTA Dispatch Hub') : 'ServiceVoice AI'}
           </h4>
         </div>
       </div>
@@ -125,7 +126,6 @@ const App: React.FC = () => {
   const handleDemoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
@@ -145,12 +145,13 @@ const App: React.FC = () => {
         name: 'submit_lead',
         parameters: {
           type: Type.OBJECT,
-          description: 'Submit customer lead data directly to the White-Label CRM.',
+          description: 'Submit customer lead data for a GTA-based HVAC brand.',
           properties: {
             name: { type: Type.STRING },
             phone: { type: Type.STRING },
+            address: { type: Type.STRING, description: 'Service address in the GTA' },
             summary: { type: Type.STRING },
-            temp: { type: Type.STRING, description: 'HOT or WARM' },
+            program: { type: Type.STRING, description: 'Rebate program interest (e.g., Enbridge, HRS)' },
             persona: { type: Type.STRING, description: 'Chloe or Sam' }
           },
           required: ['name', 'phone', 'summary']
@@ -177,7 +178,7 @@ const App: React.FC = () => {
                 if (fc.name === 'submit_lead') {
                   setLastLead(fc.args);
                   sessionPromise.then(s => s.sendToolResponse({
-                    functionResponses: { id: fc.id, name: fc.name, response: { result: "lead successfully pushed to CRM" } }
+                    functionResponses: { id: fc.id, name: fc.name, response: { result: "lead successfully pushed to GTA dispatch queue" } }
                   }));
                 }
               }
@@ -198,17 +199,20 @@ const App: React.FC = () => {
         config: {
           responseModalities: [Modality.AUDIO],
           tools: [{ functionDeclarations: [leadFunction] }],
-          systemInstruction: `You are ServiceVoice AI, a white-label voice solution. 
-          Today you are demonstrating your capabilities to an HVAC contractor.
+          systemInstruction: `You are ServiceVoice GTA AI, a white-label voice solution specialized for the Toronto and Greater Toronto Area HVAC market. 
+          You are demonstrating your capabilities to a local HVAC owner.
+          MARKET CONTEXT:
+          - Focus: Toronto (416/647) and surrounding GTA regions (905).
+          - Rebates: Home Renovation Savings (HRS) program, Enbridge Gas incentives. 
+          - Logic: Up to $7500 for electric-to-heat-pump, $2000 for gas hybrid.
           PERSONAS:
-          - Chloe: Expert in 2026 Home Renovation Savings (HRS). Friendly. $7500 electric / $2000 gas rebates.
-          - Sam: Urgent emergency dispatcher. 4-hour guarantee.
-          SWITCHING: If they mention emergency (leak, no heat), switch to Sam.
-          MANDATORY: If gas smell, say: "Leave the house, hang up, call 911 immediately."`
+          - Chloe: GTA Rebate Strategist. Knowledgeable about Ontario energy audits.
+          - Sam: Priority GTA Dispatcher. Covers Scarborough to Oakville. 4-hour response guarantee.
+          MANDATORY SAFETY: If gas smell (Enbridge emergency), say: "Hang up, leave the house immediately, and call 911. Your safety is first."`
         }
       });
       sessionRef.current = await sessionPromise;
-    } catch (e) { alert("Mic required for demo."); }
+    } catch (e) { alert("Mic required for GTA market demo."); }
   };
 
   const stopVoiceDemo = () => {
@@ -227,17 +231,17 @@ const App: React.FC = () => {
             <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center transform rotate-12 shadow-lg shadow-sky-600/20">
               <BoltIcon className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">ServiceVoice<span className="text-sky-600">.</span></h1>
+            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">ServiceVoice <span className="text-sky-600 font-medium lowercase">GTA</span></h1>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-bold uppercase tracking-widest hover:text-sky-600 transition-colors">Platform</a>
+            <a href="#features" className="text-sm font-bold uppercase tracking-widest hover:text-sky-600 transition-colors">GTA Features</a>
             <a href="#pricing" className="text-sm font-bold uppercase tracking-widest hover:text-sky-600 transition-colors">Pricing</a>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">
               {isDarkMode ? <SunIcon className="w-5 h-5 text-yellow-500" /> : <MoonIcon className="w-5 h-5 text-slate-700" />}
             </button>
             <button className="bg-sky-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl shadow-sky-600/20 hover:scale-105 active:scale-95 transition-all">
-              Book Tech Demo
+              Request GTA Quote
             </button>
           </div>
         </div>
@@ -247,18 +251,18 @@ const App: React.FC = () => {
       <section className="pt-40 pb-20 px-6">
         <div className="max-w-7xl mx-auto text-center space-y-12">
           <div className="inline-flex items-center gap-2 bg-sky-500/10 text-sky-600 dark:text-sky-400 px-4 py-2 rounded-full border border-sky-500/20">
-            <SparklesIcon className="w-4 h-4 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">2026 HVAC SaaS Breakthrough</span>
+            <MapPinIcon className="w-4 h-4 text-orange-500" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Toronto & GTA Market Optimized</span>
           </div>
 
           <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] max-w-5xl mx-auto">
-            Your Brand.<br/>
-            Our <span className="text-sky-600">Voice.</span><br/>
-            Total <span className="text-orange-500">Revenue.</span>
+            GTA HVAC.<br/>
+            Fully <span className="text-sky-600">Automated.</span><br/>
+            No <span className="text-orange-500">Missed Calls.</span>
           </h2>
 
           <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400 font-medium max-w-3xl mx-auto leading-relaxed">
-            ServiceVoice provides HVAC contractors with high-fidelity AI agents that integrate directly with Jobber and ServiceTitan. Pre-qualify $10k rebates and dispatch 24/7.
+            ServiceVoice is the first AI voice dispatcher built specifically for the unique demands of the Toronto market. From Enbridge rebates to 416 emergency dispatch.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -266,11 +270,11 @@ const App: React.FC = () => {
               onClick={startVoiceDemo} 
               className={`px-12 py-8 rounded-[2rem] font-black text-2xl shadow-2xl transition-all flex items-center justify-center gap-4 active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}
             >
-              {isVoiceActive ? 'Stop Demo Agent' : 'Live Demo: Talk To AI'}
+              {isVoiceActive ? 'Hang Up Demo' : 'Try GTA Voice Agent'}
               <MicrophoneIcon className="w-6 h-6" />
             </button>
             <a href="#request-demo" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-white/10 px-12 py-8 rounded-[2.5rem] font-black text-2xl hover:bg-slate-50 transition-all flex items-center justify-center">
-              Get SaaS Quote
+              Market Pricing
             </a>
           </div>
         </div>
@@ -285,30 +289,30 @@ const App: React.FC = () => {
             </div>
             
             <div className="space-y-8 relative z-10">
-              <h3 className="text-4xl font-black tracking-tighter">AI Persona Engine</h3>
-              <p className="text-lg text-slate-500 font-medium">Switch between Chloe (Sales) and Sam (Emergency) to see how the white-label agent handles different customer intents.</p>
+              <h3 className="text-4xl font-black tracking-tighter">GTA Logic Modes</h3>
+              <p className="text-lg text-slate-500 font-medium">Switch modes to see how ServiceVoice handles Toronto-specific scenarios like the Home Renovation Savings (HRS) program or 24/7 winter emergencies.</p>
               
               <div className="grid grid-cols-2 gap-4">
                 <button 
                   onClick={() => setActivePersona('chloe')} 
                   className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'chloe' ? 'border-sky-500 bg-sky-500/10' : 'border-slate-200 dark:border-white/10'}`}
                 >
-                  <ChatBubbleBottomCenterTextIcon className="w-8 h-8 text-sky-600" />
-                  <span className="font-black text-xs uppercase tracking-widest">Chloe (Sales)</span>
+                  <SunIcon className="w-8 h-8 text-sky-600" />
+                  <span className="font-black text-xs uppercase tracking-widest">Chloe (GTA Rebates)</span>
                 </button>
                 <button 
                   onClick={() => setActivePersona('sam')} 
                   className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 ${activePersona === 'sam' ? 'border-orange-500 bg-orange-500/10' : 'border-slate-200 dark:border-white/10'}`}
                 >
-                  <WrenchScrewdriverIcon className="w-8 h-8 text-orange-600" />
-                  <span className="font-black text-xs uppercase tracking-widest">Sam (Dispatch)</span>
+                  <BoltIcon className="w-8 h-8 text-orange-600" />
+                  <span className="font-black text-xs uppercase tracking-widest">Sam (GTA Dispatch)</span>
                 </button>
               </div>
 
               {lastLead && (
                 <div className="mt-8 p-6 bg-green-500/10 border border-green-500/20 rounded-3xl animate-in zoom-in duration-500">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-[10px] font-black uppercase text-green-600">Lead Pushed to CRM</span>
+                    <span className="text-[10px] font-black uppercase text-green-600">Lead Routed to GTA Tech</span>
                     <CheckBadgeIcon className="w-5 h-5 text-green-600" />
                   </div>
                   <pre className="text-[10px] font-mono opacity-60 overflow-x-auto text-left">
@@ -323,40 +327,40 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Feature Bento Grid */}
+      {/* GTA Specific Bento Grid */}
       <section id="features" className="py-20 px-6 bg-slate-100 dark:bg-white/5">
         <div className="max-w-7xl mx-auto space-y-20">
           <div className="text-center">
-            <h3 className="text-4xl md:text-6xl font-black tracking-tighter">Contractor First Platform</h3>
+            <h3 className="text-4xl md:text-6xl font-black tracking-tighter">Toronto Market Integration</h3>
           </div>
 
-          <div className="grid md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col justify-between border-sky-500/10 hover:border-sky-500/30 transition-all text-left">
-              <RectangleGroupIcon className="w-12 h-12 text-sky-600 mb-8" />
+          <div className="grid md:grid-cols-12 gap-6 h-auto">
+            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col justify-between border-sky-500/10 text-left">
+              <GlobeAltIcon className="w-12 h-12 text-sky-600 mb-8" />
               <div>
-                <h4 className="text-3xl font-black mb-4 tracking-tight">Full CRM Integration</h4>
-                <p className="text-lg text-slate-500 font-medium">Connect ServiceVoice to Jobber, ServiceTitan, or Housecall Pro in seconds. AI-captured leads appear instantly as 'Ready-to-Schedule' jobs in your dashboard.</p>
+                <h4 className="text-3xl font-black mb-4 tracking-tight">416 & 905 Routing</h4>
+                <p className="text-lg text-slate-500 font-medium">Smart routing that understands the difference between a Mississauga service call and an Etobicoke emergency. Route leads based on your team's real-time GTA location.</p>
               </div>
             </div>
-            <div className="md:col-span-4 bg-sky-600 rounded-[3rem] p-10 text-white flex flex-col justify-between shadow-2xl shadow-sky-600/30 text-left">
-              <DevicePhoneMobileIcon className="w-12 h-12 mb-8" />
+            <div className="md:col-span-4 bg-orange-600 rounded-[3rem] p-10 text-white flex flex-col justify-between text-left shadow-2xl shadow-orange-600/30">
+              <BoltIcon className="w-12 h-12 mb-8" />
               <div>
-                <h4 className="text-3xl font-black mb-4 tracking-tight">Mobile First</h4>
-                <p className="opacity-80 font-bold">Manage your AI settings from the job site. Update pricing or dispatch rules in real-time.</p>
+                <h4 className="text-3xl font-black mb-4 tracking-tight">HRS Pre-Qual</h4>
+                <p className="opacity-80 font-bold tracking-tight">AI Chloe automatically checks if GTA homeowners qualify for the $7,500 electric or $2,000 gas rebates before you ever send a tech.</p>
               </div>
             </div>
-            <div className="md:col-span-4 glass-card rounded-[3rem] p-10 flex flex-col border-orange-500/10 hover:border-orange-500/30 transition-all text-left">
-              <BoltIcon className="w-12 h-12 text-orange-600 mb-8" />
-              <h4 className="text-2xl font-black mb-4 tracking-tight">Instant ROI</h4>
-              <p className="text-sm text-slate-500 font-bold">The platform pays for itself with the first saved emergency furnace install. Typical ROI is 10x in the first 30 days.</p>
-            </div>
-            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col md:flex-row gap-8 items-center border-slate-200 dark:border-white/10 text-left">
-              <div className="flex-1">
-                <h4 className="text-3xl font-black mb-4 tracking-tight">Multi-Region Logic</h4>
-                <p className="text-lg text-slate-500 font-medium">Automatically route calls based on area code. Perfect for contractors covering massive regions like the GTA or Tri-State area.</p>
+            <div className="md:col-span-12 glass-card rounded-[3rem] p-10 flex flex-col md:flex-row gap-12 items-center border-slate-200 dark:border-white/10 text-left">
+              <div className="flex-1 space-y-6">
+                <h4 className="text-4xl font-black tracking-tight">Enbridge Billing Ready</h4>
+                <p className="text-xl text-slate-500 font-medium leading-relaxed">Our AI is pre-trained on Toronto energy billing cycles and Enbridge Gas service protocols. We talk to your customers in a language they trust.</p>
+                <div className="flex gap-4">
+                  {["Scarborough", "Etobicoke", "North York", "Downtown"].map((city) => (
+                    <span key={city} className="bg-slate-200 dark:bg-white/5 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">{city}</span>
+                  ))}
+                </div>
               </div>
-              <div className="w-full md:w-64 h-32 bg-slate-200 dark:bg-slate-800 rounded-3xl flex items-center justify-center">
-                 <GlobeAltIcon className="w-16 h-16 opacity-20" />
+              <div className="w-full md:w-80 h-48 bg-slate-900 rounded-[2rem] flex items-center justify-center p-8 border border-white/10">
+                 <img src="https://picsum.photos/400/200?random=20" alt="Dashboard" className="rounded-xl opacity-50 grayscale" />
               </div>
             </div>
           </div>
@@ -367,8 +371,8 @@ const App: React.FC = () => {
       <section id="pricing" className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20 space-y-4">
-            <h3 className="text-4xl md:text-6xl font-black tracking-tighter">SaaS Plans</h3>
-            <p className="text-xl text-slate-500 font-bold">Simple, transparent pricing for any fleet size.</p>
+            <h3 className="text-4xl md:text-6xl font-black tracking-tighter">GTA Market Plans</h3>
+            <p className="text-xl text-slate-500 font-bold">Simple pricing tailored for Southern Ontario fleets.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -386,7 +390,7 @@ const App: React.FC = () => {
                   ))}
                 </div>
                 <a href="#request-demo" className={`w-full py-6 rounded-3xl font-black text-xl transition-all text-center ${tier.popular ? 'bg-white text-sky-600' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
-                  Deploy AI
+                  Deploy AI Agent
                 </a>
               </div>
             ))}
@@ -405,8 +409,8 @@ const App: React.FC = () => {
         
         <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">
           <div className="space-y-4">
-            <h3 className="text-4xl md:text-6xl font-black tracking-tighter italic">Ready to scale your brand?</h3>
-            <p className="text-xl opacity-60 font-medium">Enter your details below and one of our AI specialists will reach out for a personalized technical walkthrough.</p>
+            <h3 className="text-4xl md:text-6xl font-black tracking-tighter italic">Dominate your GTA territory.</h3>
+            <p className="text-xl opacity-60 font-medium">Get a personalized ServiceVoice setup that includes GTA rebate pre-qualification and 416/905 dispatch routing logic.</p>
           </div>
 
           {isSubmitted ? (
@@ -414,14 +418,9 @@ const App: React.FC = () => {
               <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-green-500/40">
                 <CheckBadgeIcon className="w-12 h-12 text-white" />
               </div>
-              <h4 className="text-3xl font-black tracking-tight">Demo Request Received!</h4>
-              <p className="text-lg opacity-70 font-bold uppercase tracking-widest">We will contact you within 24 hours.</p>
-              <button 
-                onClick={() => setIsSubmitted(false)}
-                className="text-sky-400 font-black uppercase tracking-widest text-sm hover:underline"
-              >
-                Send another request
-              </button>
+              <h4 className="text-3xl font-black tracking-tight">GTA Demo Request Received!</h4>
+              <p className="text-lg opacity-70 font-bold uppercase tracking-widest">A Toronto specialist will contact you shortly.</p>
+              <button onClick={() => setIsSubmitted(false)} className="text-sky-400 font-black uppercase tracking-widest text-sm hover:underline">Send another request</button>
             </div>
           ) : (
             <form onSubmit={handleDemoSubmit} className="glass-card p-8 md:p-12 rounded-[3rem] border-white/10 space-y-6 text-left">
@@ -430,65 +429,29 @@ const App: React.FC = () => {
                   <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Full Name</label>
                   <div className="relative">
                     <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
-                    <input 
-                      required
-                      type="text" 
-                      placeholder="e.g. John Doe"
-                      value={demoRequest.name}
-                      onChange={(e) => setDemoRequest({...demoRequest, name: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold"
-                    />
+                    <input required type="text" placeholder="John Doe" value={demoRequest.name} onChange={(e) => setDemoRequest({...demoRequest, name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Email Address</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">GTA Business Email</label>
                   <div className="relative">
                     <EnvelopeIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
-                    <input 
-                      required
-                      type="email" 
-                      placeholder="john@hvacbrand.com"
-                      value={demoRequest.email}
-                      onChange={(e) => setDemoRequest({...demoRequest, email: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold"
-                    />
+                    <input required type="email" placeholder="owner@gta-hvac.ca" value={demoRequest.email} onChange={(e) => setDemoRequest({...demoRequest, email: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold" />
                   </div>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Business Phone</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Business Phone (416/905/647)</label>
                 <div className="relative">
                   <PhoneIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
-                  <input 
-                    required
-                    type="tel" 
-                    placeholder="+1 (555) 000-0000"
-                    value={demoRequest.phone}
-                    onChange={(e) => setDemoRequest({...demoRequest, phone: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold"
-                  />
+                  <input required type="tel" placeholder="+1 (416) 000-0000" value={demoRequest.phone} onChange={(e) => setDemoRequest({...demoRequest, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold" />
                 </div>
               </div>
 
-              <button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="w-full bg-sky-600 hover:bg-sky-500 text-white py-6 rounded-2xl font-black text-xl shadow-2xl shadow-sky-600/20 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    Request a Demo
-                    <ArrowRightIcon className="w-6 h-6" />
-                  </>
-                )}
+              <button type="submit" disabled={isSubmitting} className="w-full bg-sky-600 hover:bg-sky-500 text-white py-6 rounded-2xl font-black text-xl shadow-2xl shadow-sky-600/20 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50">
+                {isSubmitting ? <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div> : <>Request GTA Demo <ArrowRightIcon className="w-6 h-6" /></>}
               </button>
-
-              <p className="text-[10px] text-center opacity-40 font-bold uppercase tracking-widest pt-4">
-                By requesting a demo, you agree to our terms of service and privacy policy.
-              </p>
             </form>
           )}
         </div>
@@ -500,58 +463,49 @@ const App: React.FC = () => {
           <div className="grid md:grid-cols-4 gap-16 pb-20 text-left">
             <div className="md:col-span-1 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center">
-                  <BoltIcon className="w-4 h-4 text-white" />
-                </div>
+                <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center italic">GTA</div>
                 <span className="text-xl font-black tracking-tighter uppercase">ServiceVoice.</span>
               </div>
-              <p className="text-sm font-bold opacity-40 leading-relaxed uppercase tracking-widest">
-                The leading 2026 white-label AI voice solution for HVAC contractors worldwide. 
-              </p>
+              <p className="text-sm font-bold opacity-40 leading-relaxed uppercase tracking-widest">The leading 2026 white-label AI voice solution for the Greater Toronto Area. Built in Toronto, for Toronto.</p>
             </div>
             
             <div className="space-y-6">
-              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-sky-500">Product</h5>
+              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-sky-500">Market Coverage</h5>
               <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
-                <li><a href="#" className="hover:text-white transition-colors">AI Agents</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Dashboard</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Voice Lab</a></li>
+                <li>Toronto Central</li>
+                <li>Peel & Halton</li>
+                <li>York & Durham</li>
+                <li>Hamilton & Niagara</li>
               </ul>
             </div>
 
             <div className="space-y-6">
-              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-orange-500">Support</h5>
+              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-orange-500">Regional Support</h5>
               <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Status</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Partner Program</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Support</a></li>
+                <li>HRS Program Guide</li>
+                <li>Enbridge Partner Info</li>
+                <li>GTA Technical Docs</li>
+                <li>Live Toronto Support</li>
               </ul>
             </div>
 
             <div className="space-y-6">
-              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">Legal</h5>
+              <h5 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">Compliance</h5>
               <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+                <li>Ontario Privacy Act</li>
+                <li>TSSA Standards AI</li>
+                <li>NRCAN Certified Data</li>
+                <li>GTA Security Center</li>
               </ul>
             </div>
           </div>
 
           <div className="pt-16 flex flex-col md:flex-row justify-between items-center gap-8">
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">© 2026 ServiceVoice Technologies Inc.</p>
-            <div className="flex gap-6 opacity-40">
-               <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:opacity-100 transition-opacity cursor-pointer">
-                 <GlobeAltIcon className="w-4 h-4" />
-               </div>
-               <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:opacity-100 transition-opacity cursor-pointer">
-                 <ShieldCheckIcon className="w-4 h-4" />
-               </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">© 2026 ServiceVoice Technologies GTA.</p>
+            <div className="flex gap-6 opacity-40 italic font-black text-[10px]">
+               PROUDLY TORONTO
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">HVAC Automation Excellence</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">416/905 Market Leaders</p>
           </div>
         </div>
       </footer>
