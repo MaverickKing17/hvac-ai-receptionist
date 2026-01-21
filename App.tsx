@@ -20,7 +20,10 @@ import {
   WrenchScrewdriverIcon,
   ChatBubbleBottomCenterTextIcon,
   XMarkIcon,
-  SparklesIcon
+  SparklesIcon,
+  EnvelopeIcon,
+  UserIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/solid';
 
 // --- Audio Helpers ---
@@ -102,6 +105,11 @@ const App: React.FC = () => {
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [activePersona, setActivePersona] = useState<'chloe' | 'sam'>('chloe');
   const [lastLead, setLastLead] = useState<any>(null);
+  
+  // Lead Form State
+  const [demoRequest, setDemoRequest] = useState({ name: '', email: '', phone: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const outContextRef = useRef<AudioContext | null>(null);
@@ -113,6 +121,17 @@ const App: React.FC = () => {
     if (isDarkMode) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
   }, [isDarkMode]);
+
+  const handleDemoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      setDemoRequest({ name: '', email: '', phone: '' });
+    }, 1500);
+  };
 
   const startVoiceDemo = async () => {
     if (isVoiceActive) { stopVoiceDemo(); return; }
@@ -250,9 +269,9 @@ const App: React.FC = () => {
               {isVoiceActive ? 'Stop Demo Agent' : 'Live Demo: Talk To AI'}
               <MicrophoneIcon className="w-6 h-6" />
             </button>
-            <button className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-white/10 px-12 py-8 rounded-[2.5rem] font-black text-2xl hover:bg-slate-50 transition-all">
+            <a href="#request-demo" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-white/10 px-12 py-8 rounded-[2.5rem] font-black text-2xl hover:bg-slate-50 transition-all flex items-center justify-center">
               Get SaaS Quote
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -260,7 +279,7 @@ const App: React.FC = () => {
       {/* Interactive Demo Hub */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div className="glass-card rounded-[3rem] p-12 border-sky-500/20 relative overflow-hidden">
+          <div className="glass-card rounded-[3rem] p-12 border-sky-500/20 relative overflow-hidden text-left">
             <div className="absolute top-0 right-0 p-8 opacity-10">
               <CpuChipIcon className="w-40 h-40" />
             </div>
@@ -292,7 +311,7 @@ const App: React.FC = () => {
                     <span className="text-[10px] font-black uppercase text-green-600">Lead Pushed to CRM</span>
                     <CheckBadgeIcon className="w-5 h-5 text-green-600" />
                   </div>
-                  <pre className="text-[10px] font-mono opacity-60 overflow-x-auto">
+                  <pre className="text-[10px] font-mono opacity-60 overflow-x-auto text-left">
                     {JSON.stringify(lastLead, null, 2)}
                   </pre>
                 </div>
@@ -312,26 +331,26 @@ const App: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col justify-between border-sky-500/10 hover:border-sky-500/30 transition-all">
+            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col justify-between border-sky-500/10 hover:border-sky-500/30 transition-all text-left">
               <RectangleGroupIcon className="w-12 h-12 text-sky-600 mb-8" />
               <div>
                 <h4 className="text-3xl font-black mb-4 tracking-tight">Full CRM Integration</h4>
                 <p className="text-lg text-slate-500 font-medium">Connect ServiceVoice to Jobber, ServiceTitan, or Housecall Pro in seconds. AI-captured leads appear instantly as 'Ready-to-Schedule' jobs in your dashboard.</p>
               </div>
             </div>
-            <div className="md:col-span-4 bg-sky-600 rounded-[3rem] p-10 text-white flex flex-col justify-between shadow-2xl shadow-sky-600/30">
+            <div className="md:col-span-4 bg-sky-600 rounded-[3rem] p-10 text-white flex flex-col justify-between shadow-2xl shadow-sky-600/30 text-left">
               <DevicePhoneMobileIcon className="w-12 h-12 mb-8" />
               <div>
                 <h4 className="text-3xl font-black mb-4 tracking-tight">Mobile First</h4>
                 <p className="opacity-80 font-bold">Manage your AI settings from the job site. Update pricing or dispatch rules in real-time.</p>
               </div>
             </div>
-            <div className="md:col-span-4 glass-card rounded-[3rem] p-10 flex flex-col border-orange-500/10 hover:border-orange-500/30 transition-all">
+            <div className="md:col-span-4 glass-card rounded-[3rem] p-10 flex flex-col border-orange-500/10 hover:border-orange-500/30 transition-all text-left">
               <BoltIcon className="w-12 h-12 text-orange-600 mb-8" />
               <h4 className="text-2xl font-black mb-4 tracking-tight">Instant ROI</h4>
               <p className="text-sm text-slate-500 font-bold">The platform pays for itself with the first saved emergency furnace install. Typical ROI is 10x in the first 30 days.</p>
             </div>
-            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col md:flex-row gap-8 items-center border-slate-200 dark:border-white/10">
+            <div className="md:col-span-8 glass-card rounded-[3rem] p-10 flex flex-col md:flex-row gap-8 items-center border-slate-200 dark:border-white/10 text-left">
               <div className="flex-1">
                 <h4 className="text-3xl font-black mb-4 tracking-tight">Multi-Region Logic</h4>
                 <p className="text-lg text-slate-500 font-medium">Automatically route calls based on area code. Perfect for contractors covering massive regions like the GTA or Tri-State area.</p>
@@ -354,7 +373,7 @@ const App: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {CONFIG.pricing.map((tier, i) => (
-              <div key={i} className={`p-10 rounded-[3.5rem] border-2 flex flex-col transition-all duration-500 hover:scale-[1.02] ${tier.popular ? 'bg-sky-600 border-sky-500 text-white shadow-2xl shadow-sky-600/40' : 'glass-card border-slate-200 dark:border-white/10'}`}>
+              <div key={i} className={`p-10 rounded-[3.5rem] border-2 flex flex-col transition-all duration-500 hover:scale-[1.02] text-left ${tier.popular ? 'bg-sky-600 border-sky-500 text-white shadow-2xl shadow-sky-600/40' : 'glass-card border-slate-200 dark:border-white/10'}`}>
                 <h4 className="text-xl font-black uppercase tracking-widest mb-2 opacity-80">{tier.name}</h4>
                 <div className="text-5xl font-black mb-8">{tier.price}</div>
                 <p className={`text-lg font-bold mb-10 ${tier.popular ? 'opacity-90' : 'text-slate-500'}`}>{tier.description}</p>
@@ -366,19 +385,119 @@ const App: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <button className={`w-full py-6 rounded-3xl font-black text-xl transition-all ${tier.popular ? 'bg-white text-sky-600' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
+                <a href="#request-demo" className={`w-full py-6 rounded-3xl font-black text-xl transition-all text-center ${tier.popular ? 'bg-white text-sky-600' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
                   Deploy AI
-                </button>
+                </a>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Lead Capture Section */}
+      <section id="request-demo" className="py-32 px-6 bg-slate-900 dark:bg-slate-900 text-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100" fill="none" stroke="white" strokeWidth="0.1" />
+            <path d="M0 80 C 30 20 60 20 100 80" fill="none" stroke="white" strokeWidth="0.1" />
+          </svg>
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">
+          <div className="space-y-4">
+            <h3 className="text-4xl md:text-6xl font-black tracking-tighter italic">Ready to scale your brand?</h3>
+            <p className="text-xl opacity-60 font-medium">Enter your details below and one of our AI specialists will reach out for a personalized technical walkthrough.</p>
+          </div>
+
+          {isSubmitted ? (
+            <div className="glass-card p-12 rounded-[3rem] border-green-500/30 space-y-6 animate-in zoom-in duration-700">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-green-500/40">
+                <CheckBadgeIcon className="w-12 h-12 text-white" />
+              </div>
+              <h4 className="text-3xl font-black tracking-tight">Demo Request Received!</h4>
+              <p className="text-lg opacity-70 font-bold uppercase tracking-widest">We will contact you within 24 hours.</p>
+              <button 
+                onClick={() => setIsSubmitted(false)}
+                className="text-sky-400 font-black uppercase tracking-widest text-sm hover:underline"
+              >
+                Send another request
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleDemoSubmit} className="glass-card p-8 md:p-12 rounded-[3rem] border-white/10 space-y-6 text-left">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Full Name</label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="e.g. John Doe"
+                      value={demoRequest.name}
+                      onChange={(e) => setDemoRequest({...demoRequest, name: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Email Address</label>
+                  <div className="relative">
+                    <EnvelopeIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
+                    <input 
+                      required
+                      type="email" 
+                      placeholder="john@hvacbrand.com"
+                      value={demoRequest.email}
+                      onChange={(e) => setDemoRequest({...demoRequest, email: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 ml-2">Business Phone</label>
+                <div className="relative">
+                  <PhoneIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" />
+                  <input 
+                    required
+                    type="tel" 
+                    placeholder="+1 (555) 000-0000"
+                    value={demoRequest.phone}
+                    onChange={(e) => setDemoRequest({...demoRequest, phone: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-sky-500 transition-all font-bold"
+                  />
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-sky-600 hover:bg-sky-500 text-white py-6 rounded-2xl font-black text-xl shadow-2xl shadow-sky-600/20 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    Request a Demo
+                    <ArrowRightIcon className="w-6 h-6" />
+                  </>
+                )}
+              </button>
+
+              <p className="text-[10px] text-center opacity-40 font-bold uppercase tracking-widest pt-4">
+                By requesting a demo, you agree to our terms of service and privacy policy.
+              </p>
+            </form>
+          )}
+        </div>
+      </section>
+
       {/* Professional SaaS Footer */}
       <footer className="bg-slate-950 text-white pt-32 pb-16 px-6">
         <div className="max-w-7xl mx-auto divide-y divide-white/10">
-          <div className="grid md:grid-cols-4 gap-16 pb-20">
+          <div className="grid md:grid-cols-4 gap-16 pb-20 text-left">
             <div className="md:col-span-1 space-y-6">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center">
