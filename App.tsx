@@ -7,12 +7,9 @@ import {
   MicrophoneIcon,
   SunIcon,
   MoonIcon,
-  CheckBadgeIcon,
   BoltIcon,
   ShieldCheckIcon,
-  RectangleGroupIcon,
   DevicePhoneMobileIcon,
-  GlobeAltIcon,
   WrenchScrewdriverIcon,
   XMarkIcon,
   EnvelopeIcon,
@@ -29,12 +26,21 @@ import {
   ArrowPathIcon,
   FireIcon,
   ChartBarIcon,
-  CpuChipIcon
+  CpuChipIcon,
+  IdentificationIcon,
+  CubeIcon,
+  LockClosedIcon,
+  HashtagIcon,
+  // Fix: Add missing GlobeAltIcon import
+  GlobeAltIcon
 } from '@heroicons/react/24/solid';
 
-// --- Webhook & Constants ---
+// --- Constants ---
+// Fix: Define missing WEBHOOK_URL constant from project requirements
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwhfqnUN4rTpJeQED9TBNphEOhkUxsBZrUIPL5Wvwxm/dev";
-const CALENDLY_URL = "https://calendly.com/kingnarmer702/emergency-furnace-replacement-quote-priority";
+
+// --- Web3 / DID Mock Helper ---
+const MOCK_DID = "did:gta:hvac:0x71C765...661";
 
 // --- Audio Helpers ---
 function decode(base64: string) {
@@ -101,91 +107,102 @@ const playChime = (type: 'sales' | 'support' | 'emergency') => {
   setTimeout(() => ctx.close(), 1000);
 };
 
-// --- Components ---
+// --- Sub-Components ---
 
-const FuturisticOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam'; status: 'idle' | 'connecting' | 'connected' | 'error' }> = ({ isActive, mode, status }) => {
+const NeuralOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam'; status: 'idle' | 'connecting' | 'connected' | 'error' }> = ({ isActive, mode, status }) => {
   const color = mode === 'sam' ? 'orange' : 'sky';
   return (
-    <div className="relative flex items-center justify-center h-[500px]">
-      {/* Outer Glows */}
-      <div className={`absolute w-[500px] h-[500px] bg-${color}-500/10 rounded-full blur-[120px] transition-all duration-1000 ${isActive ? 'scale-150 opacity-60' : 'scale-100 opacity-20'}`}></div>
+    <div className="relative flex items-center justify-center h-[550px] group">
+      {/* Dynamic Background Aura */}
+      <div className={`absolute w-[600px] h-[600px] bg-${color}-500/10 rounded-full blur-[140px] transition-all duration-1000 ${isActive ? 'scale-150 opacity-70 rotate-45' : 'scale-100 opacity-20'}`}></div>
       
-      {/* Core Container */}
-      <div className={`relative w-80 h-80 md:w-96 md:h-96 bg-white dark:bg-slate-900 rounded-[4rem] shadow-2xl border transition-all duration-700 flex flex-col items-center justify-center p-12 overflow-hidden ${isActive ? `border-${color}-500 ring-[12px] ring-${color}-500/5` : 'border-slate-200 dark:border-white/5'}`}>
+      {/* Central Module */}
+      <div className={`relative w-80 h-80 md:w-[400px] md:h-[400px] bg-white dark:bg-[#0f172a] rounded-[5rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] border transition-all duration-700 flex flex-col items-center justify-center p-14 overflow-hidden ${isActive ? `border-${color}-500/50 ring-[15px] ring-${color}-500/5` : 'border-slate-200 dark:border-white/5'}`}>
         
-        {/* Animated Background Grids */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        {/* Web3 Verified Badge (Simulated) */}
+        <div className="absolute top-10 right-10 flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-full">
+            <ShieldCheckIcon className="w-3 h-3 text-green-500" />
+            <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">DID Verified</span>
+        </div>
+
+        {/* Status Scanner Line */}
+        <div className={`absolute top-0 left-0 w-full h-[3px] transition-all duration-500 ${status === 'connected' ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.8)]' : status === 'error' ? 'bg-red-500 shadow-[0_0_15px_rgba(239,44,44,0.8)]' : status === 'connecting' ? 'bg-sky-500 animate-pulse' : 'bg-transparent'}`}></div>
         
-        {/* Connection Status Bar */}
-        <div className={`absolute top-0 left-0 w-full h-2 transition-all duration-500 ${status === 'connected' ? 'bg-green-500' : status === 'error' ? 'bg-red-500' : status === 'connecting' ? 'bg-sky-500 animate-pulse' : 'bg-transparent'}`}></div>
-        
-        {/* Pulse Waves */}
-        <div className="absolute bottom-12 flex gap-2 items-end h-16">
-          {[...Array(16)].map((_, i) => (
-            <div key={i} className={`w-2.5 rounded-full transition-all duration-300 ${isActive ? `bg-${color}-500 animate-wave-dynamic` : 'bg-slate-100 dark:bg-slate-800'}`} style={{ animationDelay: `${i * 0.05}s`, height: isActive ? '100%' : '6px' }}></div>
+        {/* Neural Waveform Visualization */}
+        <div className="absolute inset-x-12 bottom-16 flex gap-2 items-end h-20">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className={`flex-1 rounded-full transition-all duration-300 ${isActive ? `bg-${color}-500 animate-wave-dynamic` : 'bg-slate-100 dark:bg-slate-800'}`} style={{ animationDelay: `${i * 0.04}s`, height: isActive ? '100%' : '8px' }}></div>
           ))}
         </div>
 
-        {/* Icon Hub */}
-        <div className={`w-28 h-28 rounded-[2.5rem] flex items-center justify-center transition-all duration-700 relative group ${isActive ? `bg-${color}-600 scale-110 shadow-2xl` : 'bg-slate-50 dark:bg-slate-800/50'}`}>
+        {/* Identity Core */}
+        <div className={`w-32 h-32 rounded-[3rem] flex items-center justify-center transition-all duration-700 relative z-20 ${isActive ? `bg-${color}-600 scale-110 shadow-3xl` : 'bg-slate-50 dark:bg-slate-800/50'}`}>
             {status === 'error' ? (
-                <ExclamationTriangleIcon className="w-14 h-14 text-red-500 animate-pulse" />
+                <ExclamationTriangleIcon className="w-16 h-16 text-red-500 animate-pulse" />
             ) : mode === 'sam' ? (
-                <FireIcon className={`w-14 h-14 transition-colors ${isActive ? 'text-white' : 'text-slate-300'}`} />
+                <FireIcon className={`w-16 h-16 transition-colors ${isActive ? 'text-white' : 'text-slate-300'}`} />
             ) : (
-                <CpuChipIcon className={`w-14 h-14 transition-colors ${isActive ? 'text-white' : 'text-slate-300'}`} />
+                <CpuChipIcon className={`w-16 h-16 transition-colors ${isActive ? 'text-white' : 'text-slate-300'}`} />
             )}
         </div>
 
-        <div className="mt-10 text-center z-10">
-          <p className={`text-[12px] font-black uppercase tracking-[0.5em] mb-2 ${isActive ? `text-${color}-600` : status === 'error' ? 'text-red-500' : 'text-slate-400'}`}>
-            {status === 'error' ? 'CORE OFFLINE' : status === 'connecting' ? 'INITIALIZING...' : isActive ? `DISPATCH ACTIVE` : 'STANDBY MODE'}
+        <div className="mt-12 text-center z-10">
+          <p className={`text-[13px] font-black uppercase tracking-[0.6em] mb-3 ${isActive ? `text-${color}-600` : status === 'error' ? 'text-red-500' : 'text-slate-400'}`}>
+            {status === 'error' ? 'SYNC ERROR' : status === 'connecting' ? 'SYNCING NEURONS...' : isActive ? `AGENT STREAMING` : 'IDLE PROTOCOL'}
           </p>
-          <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
-            {isActive ? (mode === 'chloe' ? 'Chloe AI' : 'Sam Emergency') : 'ServiceVoice GTA'}
+          <h4 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter leading-none italic">
+            {isActive ? (mode === 'chloe' ? 'Chloe.v2' : 'Sam.v2') : 'ServiceVoice'}
           </h4>
-          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mt-2">Node: Toronto-Central-01</p>
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-3 flex items-center justify-center gap-2">
+            <MapPinIcon className="w-3 h-3" /> GTA Node 416-X
+          </p>
         </div>
       </div>
     </div>
   );
 };
 
-const InfrastructureMap: React.FC = () => {
-  const [activeNode, setActiveNode] = useState<string | null>(null);
-  const nodes = [
-    { id: 'North York', x: '52%', y: '45%' },
-    { id: 'Etobicoke', x: '42%', y: '58%' },
-    { id: 'Scarborough', x: '65%', y: '50%' },
-    { id: 'Downtown', x: '50%', y: '65%' },
-    { id: 'Mississauga East', x: '35%', y: '65%' },
-    { id: 'Markham Hub', x: '60%', y: '35%' }
-  ];
-
+const BlockchainLedger: React.FC<{ leads: any[] }> = ({ leads }) => {
   return (
-    <div className="relative w-full h-[600px] bg-slate-900 rounded-[4rem] border border-white/5 overflow-hidden shadow-3xl">
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-      <div className="absolute top-12 left-12 text-left z-20">
-        <h4 className="text-3xl font-black tracking-tighter text-white uppercase italic">GTA AI MESH</h4>
-        <div className="flex items-center gap-3 mt-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Operational Strength: 99.98%</p>
-        </div>
-      </div>
+    <div className="bg-slate-900 border border-white/5 rounded-[3rem] p-10 shadow-3xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(2,132,199,0.15),transparent)]"></div>
+        <div className="relative z-10">
+            <div className="flex justify-between items-center mb-10">
+                <div className="flex items-center gap-4">
+                    <CubeIcon className="w-6 h-6 text-sky-500" />
+                    <h4 className="text-lg font-black tracking-widest uppercase italic text-white">Verified Dispatch Ledger</h4>
+                </div>
+                <div className="text-[10px] font-black text-sky-500/60 uppercase tracking-tighter">Chain: GTA-Mainnet</div>
+            </div>
 
-      <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none">
-        <path d="M 300 400 Q 500 300 700 400" stroke="rgba(2, 132, 199, 0.5)" strokeWidth="2" fill="none" strokeDasharray="10,10" className="animate-pulse" />
-        <path d="M 400 300 Q 500 500 600 350" stroke="rgba(249, 115, 22, 0.5)" strokeWidth="2" fill="none" strokeDasharray="5,5" />
-      </svg>
-
-      {nodes.map((node) => (
-        <div key={node.id} className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer group" style={{ left: node.x, top: node.y }} onMouseEnter={() => setActiveNode(node.id)} onMouseLeave={() => setActiveNode(null)}>
-          <div className={`w-4 h-4 rounded-full border-2 transition-all duration-500 shadow-[0_0_20px_rgba(255,255,255,0.2)] ${activeNode === node.id ? 'bg-sky-500 border-white scale-150' : 'bg-white/10 border-white/20'}`}></div>
-          <div className={`absolute top-full mt-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/10 p-3 rounded-2xl transition-all duration-500 pointer-events-none ${activeNode === node.id ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-            <span className="text-[10px] font-black text-white uppercase whitespace-nowrap tracking-widest">{node.id} Active Agent</span>
-          </div>
+            {leads.length === 0 ? (
+                <div className="py-20 text-center opacity-20 flex flex-col items-center gap-4 text-white">
+                    <HashtagIcon className="w-12 h-12" />
+                    <p className="text-xs font-black uppercase tracking-widest italic">Awaiting On-Chain Event</p>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {leads.map((lead, idx) => (
+                        <div key={idx} className="p-6 bg-white/5 border border-white/5 rounded-3xl animate-in slide-in-from-right-8 duration-500 hover:bg-white/10 transition-colors">
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <p className="text-white font-black text-lg">{lead.name}</p>
+                                    <p className="text-[10px] font-mono text-sky-500/70 truncate w-48">{lead.txHash || `0x${Math.random().toString(16).slice(2, 40)}`}</p>
+                                </div>
+                                <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${lead.persona === 'sam' ? 'bg-orange-500/20 text-orange-400' : 'bg-sky-500/20 text-sky-400'}`}>
+                                    {lead.persona === 'sam' ? 'Emergency' : 'Sales'}
+                                </div>
+                            </div>
+                            <p className="text-xs text-slate-400 font-bold mb-3 italic">"{lead.summary}"</p>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                <span className="text-green-500">Confirmed</span>
+                                <span className="opacity-40">{lead.timestamp}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-      ))}
     </div>
   );
 };
@@ -195,9 +212,10 @@ const App: React.FC = () => {
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [activePersona, setActivePersona] = useState<'chloe' | 'sam'>('chloe');
-  const [lastLead, setLastLead] = useState<any>(null);
+  const [isDidConnecting, setIsDidConnecting] = useState(false);
+  const [isDidVerified, setIsDidVerified] = useState(false);
   
-  // Lead Feed
+  // Real-time Lead Ledger
   const [leads, setLeads] = useState<any[]>([]);
 
   // Demo Form
@@ -205,9 +223,9 @@ const App: React.FC = () => {
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
-  // Chat
+  // Chat Support
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatType, setChatType] = useState<'growth' | 'ops' | null>(null);
+  const [chatTopic, setChatTopic] = useState<'growth' | 'web3' | null>(null);
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([]);
 
@@ -221,6 +239,15 @@ const App: React.FC = () => {
     if (isDarkMode) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
   }, [isDarkMode]);
+
+  const handleDidConnect = () => {
+    setIsDidConnecting(true);
+    setTimeout(() => {
+        setIsDidConnecting(false);
+        setIsDidVerified(true);
+        playChime('support');
+    }, 1500);
+  };
 
   const startVoiceSession = async () => {
     if (isVoiceActive) { stopVoiceSession(); return; }
@@ -241,8 +268,7 @@ const App: React.FC = () => {
             name: { type: Type.STRING },
             phone: { type: Type.STRING },
             summary: { type: Type.STRING },
-            emergency: { type: Type.BOOLEAN },
-            heatingType: { type: Type.STRING, description: "Electric, Gas, or Oil" }
+            heatingSource: { type: Type.STRING, description: "Electric, Gas, or Oil" }
           },
           required: ['name', 'phone', 'summary']
         }
@@ -267,20 +293,25 @@ const App: React.FC = () => {
             if (msg.toolCall) {
               for (const fc of msg.toolCall.functionCalls) {
                 if (fc.name === 'submit_lead') {
-                  const data = { ...fc.args, timestamp: new Date().toLocaleTimeString(), persona: activePersona };
-                  setLeads(prev => [data, ...prev].slice(0, 5));
-                  setLastLead(data);
-                  
-                  // Webhook hit
-                  fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    mode: 'no-cors'
-                  });
+                    const txHash = `0x${Math.random().toString(16).slice(2, 40)}`;
+                    const data = { 
+                        ...fc.args, 
+                        timestamp: new Date().toLocaleTimeString(), 
+                        persona: activePersona,
+                        txHash: txHash
+                    };
+                    setLeads(prev => [data, ...prev].slice(0, 10));
+                    
+                    // Webhook dispatch
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        mode: 'no-cors'
+                    });
 
-                  sessionPromise.then(s => s.sendToolResponse({
-                    functionResponses: { id: fc.id, name: fc.name, response: { status: "dispatched", tracking_id: Math.random().toString(36).substr(2, 9) } }
-                  }));
+                    sessionPromise.then(s => s.sendToolResponse({
+                        functionResponses: { id: fc.id, name: fc.name, response: { blockchain_status: "verified", tx: txHash } }
+                    }));
                 }
               }
             }
@@ -302,13 +333,11 @@ const App: React.FC = () => {
         config: {
           responseModalities: [Modality.AUDIO],
           tools: [{ functionDeclarations: [tool_submit_lead] }],
-          systemInstruction: `You are part of the ServiceVoice GTA platform. 
-          Current Persona: ${activePersona === 'chloe' ? 'Chloe (Sales/Front-Desk)' : 'Sam (Emergency Specialist)'}.
-          Context: Toronto/GTA HVAC market.
-          Chloe: Friendly, patient, focuses on the Home Renovation Savings (HRS) program ($7500 rebates).
-          Sam: Authoritative, calm, handles gas smells, no-heat calls, 4-hour guarantee.
-          Rule: If "gas smell" is mentioned, tell them to hang up, call 911, then call back.
-          Goal: Collect Name, Phone, and Heating Type. Execute submit_lead when you have the details.`
+          systemInstruction: `Persona: ${activePersona === 'chloe' ? 'Chloe (Sales/Front-Desk)' : 'Sam (Emergency Dispatch)'}.
+          Context: 2026 HVAC Market in Toronto/GTA.
+          Chloe focuses on $7500 Enbridge rebates. Sam focuses on gas leaks and 4h emergency response.
+          Safety: If gas is smelled, instruct to hang up and call 911 immediately.
+          Execute submit_lead when lead details are captured.`
         }
       });
       sessionRef.current = await sessionPromise;
@@ -325,221 +354,236 @@ const App: React.FC = () => {
     setVoiceStatus('idle');
   };
 
-  const handleDemoSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsFormSubmitting(true);
     setTimeout(() => {
         setIsFormSubmitting(false);
         setIsFormSubmitted(true);
-    }, 1200);
+        playChime('sales');
+    }, 1500);
   };
 
-  const handleChat = async (e: React.FormEvent) => {
+  const handleChatMsg = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
-    const userMsg = chatInput;
+    const msg = chatInput;
     setChatInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setMessages(prev => [...prev, { role: 'user', text: msg }]);
     
     try {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-        const response = await ai.models.generateContent({
+        const res = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: userMsg,
-            config: { systemInstruction: `You are a high-level HVAC SaaS Strategist helping a fleet owner in Toronto with ${chatType === 'growth' ? 'revenue growth' : 'operational efficiency'}.` }
+            contents: msg,
+            config: { systemInstruction: `You are a high-level HVAC SaaS Consultant specializing in ${chatTopic === 'growth' ? 'Revenue ROI' : 'Web 3.0 Decentralized Identities'} for GTA fleets.` }
         });
-        setMessages(prev => [...prev, { role: 'ai', text: response.text || "Dispatch busy." }]);
+        setMessages(prev => [...prev, { role: 'ai', text: res.text || "Synchronizing nodes..." }]);
         playChime('support');
     } catch (err) {
-        setMessages(prev => [...prev, { role: 'ai', text: "Connection drop." }]);
+        setMessages(prev => [...prev, { role: 'ai', text: "Signal lost." }]);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-sky-500/30">
+    <div className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-sky-500/30 font-sans overflow-x-hidden">
       
-      {/* Premium Navbar */}
-      <nav className="fixed top-0 w-full z-[100] border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-8 h-24 flex justify-between items-center">
-          <div className="flex items-center gap-4 group cursor-pointer">
-            <div className="w-12 h-12 bg-sky-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(2,132,199,0.4)] transition-transform group-hover:rotate-12">
-              <BoltIcon className="w-7 h-7 text-white" />
+      {/* 2026 Navigation Hub */}
+      <nav className="fixed top-0 w-full z-[100] border-b border-slate-200 dark:border-white/5 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl">
+        <div className="max-w-screen-2xl mx-auto px-10 h-28 flex justify-between items-center">
+          <div className="flex items-center gap-5">
+            <div className="relative group">
+                <div className="absolute inset-0 bg-sky-500/40 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="w-14 h-14 bg-sky-600 rounded-[1.25rem] flex items-center justify-center shadow-2xl relative z-10 transition-transform group-hover:rotate-6">
+                    <BoltIcon className="w-8 h-8 text-white" />
+                </div>
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tighter uppercase leading-none italic">ServiceVoice <span className="text-sky-600">GTA</span></h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mt-1">Ontario Infrastructure</p>
+              <h1 className="text-2xl font-black tracking-tighter uppercase leading-none italic">ServiceVoice <span className="text-sky-600">GTA</span></h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-2 flex items-center gap-2">
+                <GlobeAltIcon className="w-3 h-3" /> Web 3.0 Infrastructure
+              </p>
             </div>
           </div>
           
-          <div className="hidden lg:flex items-center gap-12">
-            {['Capabilities', 'Intelligence', 'Fleet Pricing'].map(link => (
-                <a key={link} href="#" className="text-[12px] font-black uppercase tracking-[0.2em] hover:text-sky-600 transition-colors">{link}</a>
+          <div className="hidden xl:flex items-center gap-14">
+            {['Strategy', 'Ledger', 'Fleet DID', 'Pricing'].map(l => (
+                <a key={l} href="#" className="text-[11px] font-black uppercase tracking-[0.3em] hover:text-sky-600 transition-colors">{l}</a>
             ))}
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+            <div className="h-8 w-px bg-white/10"></div>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-4 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all active:scale-90">
               {isDarkMode ? <SunIcon className="w-6 h-6 text-yellow-500" /> : <MoonIcon className="w-6 h-6 text-slate-600" />}
             </button>
-            <button className="bg-sky-600 text-white px-10 py-4 rounded-2xl font-black text-[12px] uppercase tracking-widest hover:bg-sky-500 hover:shadow-2xl hover:shadow-sky-500/20 transition-all active:scale-95">Book Fleet Demo</button>
+            <button className="bg-sky-600 text-white px-10 py-5 rounded-[1.5rem] font-black text-[12px] uppercase tracking-widest shadow-[0_20px_40px_rgba(2,132,199,0.3)] hover:bg-sky-500 hover:shadow-sky-500/50 transition-all active:scale-95">Claim Territory</button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - The Apex of HVAC SaaS */}
-      <main className="relative pt-48 pb-32 px-8 overflow-hidden">
-        {/* Background Atmosphere */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none opacity-20">
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-sky-500/10 blur-[120px] rounded-full"></div>
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-orange-500/5 blur-[100px] rounded-full"></div>
+      {/* Hero: The Neural Frontline */}
+      <header className="relative pt-60 pb-40 px-10">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-screen-2xl h-full pointer-events-none overflow-hidden opacity-30">
+            <div className="absolute top-0 right-[-100px] w-[900px] h-[900px] bg-sky-500/10 blur-[150px] rounded-full animate-pulse"></div>
+            <div className="absolute bottom-[-200px] left-[-100px] w-[700px] h-[700px] bg-orange-500/5 blur-[120px] rounded-full"></div>
         </div>
 
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-3 bg-white/5 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-6 py-2.5 rounded-full mb-12 backdrop-blur-md">
-            <SignalIcon className="w-4 h-4 text-green-500 animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Toronto Dispatch Network Active</span>
+          <div className="inline-flex items-center gap-3 bg-white/5 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-8 py-3 rounded-full mb-16 backdrop-blur-3xl group cursor-help">
+            <SignalIcon className="w-5 h-5 text-green-500 animate-pulse" />
+            <span className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">GTA Core Grid Operational</span>
+            <div className="w-2 h-2 rounded-full bg-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.8)]"></div>
           </div>
 
-          <h2 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase mb-12 italic">
-            Voice AI For <br/>
-            <span className="text-sky-600 text-shadow-glow">GTA HVAC Leaders.</span>
+          <h2 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-[0.8] uppercase mb-14 italic text-slate-900 dark:text-white">
+            2026 Voice <br/>
+            <span className="text-sky-600 drop-shadow-[0_0_30px_rgba(2,132,199,0.3)]">AI Mastery.</span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400 font-bold max-w-4xl mx-auto leading-relaxed mb-16">
-            Eliminate missed calls. Automate $7,500 HRS rebate qualifiers. <br className="hidden md:block" /> 
-            Engineer your reception with 2026-grade dispatch intelligence.
+          <p className="text-xl md:text-3xl text-slate-500 dark:text-slate-400 font-bold max-w-5xl mx-auto leading-tight mb-20 italic">
+            Automate Toronto reception. Verify fleet identities on-chain. <br className="hidden lg:block" /> 
+            Convert Enbridge rebates while your trucks are en route.
           </p>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-            <button onClick={startVoiceSession} className={`group relative overflow-hidden px-16 py-8 rounded-[2.5rem] font-black text-2xl tracking-tighter shadow-3xl transition-all active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
-                <div className="relative z-10 flex items-center gap-4">
-                    {isVoiceActive ? 'DISCONNECT SYSTEM' : 'TRIGGER AI CORE'}
-                    <MicrophoneIcon className={`w-8 h-8 ${isVoiceActive ? 'animate-pulse' : ''}`} />
+          <div className="flex flex-col md:flex-row items-center justify-center gap-10">
+            <button onClick={startVoiceSession} className={`group relative overflow-hidden px-20 py-10 rounded-[3rem] font-black text-3xl tracking-tighter shadow-4xl transition-all active:scale-95 ${isVoiceActive ? 'bg-red-500 text-white' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'}`}>
+                <div className="relative z-10 flex items-center gap-6">
+                    {isVoiceActive ? 'SUSPEND AGENT' : 'SYNC VOICE CORE'}
+                    <MicrophoneIcon className={`w-10 h-10 ${isVoiceActive ? 'animate-pulse' : ''}`} />
                 </div>
                 {!isVoiceActive && <div className="absolute inset-0 bg-gradient-to-r from-sky-600 to-sky-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>}
             </button>
-            <a href="#leads" className="bg-white/5 border border-slate-200 dark:border-white/10 px-16 py-8 rounded-[2.5rem] font-black text-2xl tracking-tighter hover:bg-white/10 transition-all backdrop-blur-xl">VIEW FLEET DATA</a>
+            <div className="flex flex-col items-center">
+                <button className="bg-white/5 border border-slate-200 dark:border-white/10 px-16 py-10 rounded-[3rem] font-black text-2xl tracking-tighter hover:bg-white/10 transition-all backdrop-blur-2xl">VETTED FLEETS</button>
+                <span className="text-[9px] font-black text-sky-500 mt-4 uppercase tracking-[0.5em]">Open Ledger Protocol</span>
+            </div>
           </div>
         </div>
-      </main>
+      </header>
 
-      {/* Command Center - Persona & Lead Sync */}
-      <section className="py-32 px-8 max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-start">
-        <div className="space-y-16">
-          <div className="space-y-6">
-            <h3 className="text-5xl font-black tracking-tighter uppercase italic">Persona Mesh</h3>
-            <p className="text-xl text-slate-500 font-bold">Instantly toggle your agency's behavioral logic for different call flows.</p>
+      {/* Bento Grid: Market Dominance */}
+      <section className="py-40 px-10 max-w-screen-2xl mx-auto">
+        <div className="grid lg:grid-cols-3 gap-10">
+          
+          {/* Main Persona Bento */}
+          <div className="lg:col-span-2 bg-slate-50 dark:bg-white/5 rounded-[4rem] p-16 border border-slate-100 dark:border-white/5 shadow-2xl space-y-16">
+            <div className="space-y-6">
+                <h3 className="text-5xl font-black tracking-tighter uppercase italic">Persona Protocol</h3>
+                <p className="text-xl text-slate-500 font-bold italic">Dynamic logic injection based on caller intent.</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+                <button onClick={() => setActivePersona('chloe')} className={`p-10 rounded-[3.5rem] border-2 text-left transition-all duration-700 relative overflow-hidden ${activePersona === 'chloe' ? 'border-sky-500 bg-white dark:bg-sky-500/10' : 'border-transparent bg-white/5'}`}>
+                    <CpuChipIcon className={`w-14 h-14 mb-8 ${activePersona === 'chloe' ? 'text-sky-600' : 'text-slate-500'}`} />
+                    <h4 className="text-3xl font-black tracking-tighter mb-3 uppercase italic text-slate-900 dark:text-white">Chloe.v2</h4>
+                    <p className="text-sm font-bold opacity-60 leading-relaxed italic">The Growth Engine. Specializes in $7.5k rebate pre-qual and new install bookings.</p>
+                    {activePersona === 'chloe' && <div className="absolute bottom-10 right-10 w-4 h-4 bg-sky-600 rounded-full animate-ping"></div>}
+                </button>
+
+                <button onClick={() => setActivePersona('sam')} className={`p-10 rounded-[3.5rem] border-2 text-left transition-all duration-700 relative overflow-hidden ${activePersona === 'sam' ? 'border-orange-500 bg-white dark:bg-orange-500/10' : 'border-transparent bg-white/5'}`}>
+                    <FireIcon className={`w-14 h-14 mb-8 ${activePersona === 'sam' ? 'text-orange-600' : 'text-slate-500'}`} />
+                    <h4 className="text-3xl font-black tracking-tighter mb-3 uppercase italic text-slate-900 dark:text-white">Sam.v2</h4>
+                    <p className="text-sm font-bold opacity-60 leading-relaxed italic">Emergency Specialist. 4-hour response logistics and 911-safe gas protocols.</p>
+                    {activePersona === 'sam' && <div className="absolute bottom-10 right-10 w-4 h-4 bg-orange-600 rounded-full animate-ping"></div>}
+                </button>
+            </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-8">
-            <button onClick={() => setActivePersona('chloe')} className={`group p-10 rounded-[3rem] border-2 text-left transition-all duration-500 relative overflow-hidden ${activePersona === 'chloe' ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/10' : 'border-slate-200 dark:border-white/5 hover:border-slate-400'}`}>
-              <CpuChipIcon className={`w-12 h-12 mb-6 transition-colors ${activePersona === 'chloe' ? 'text-sky-600' : 'text-slate-400'}`} />
-              <h4 className="text-2xl font-black tracking-tight mb-2">CHLOE</h4>
-              <p className="text-sm font-bold opacity-60">Sales & Rebates specialist. Maximizes $7.5k HRS conversions.</p>
-              {activePersona === 'chloe' && <div className="absolute top-6 right-6 w-3 h-3 bg-sky-600 rounded-full animate-ping"></div>}
-            </button>
-
-            <button onClick={() => setActivePersona('sam')} className={`group p-10 rounded-[3rem] border-2 text-left transition-all duration-500 relative overflow-hidden ${activePersona === 'sam' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/10' : 'border-slate-200 dark:border-white/5 hover:border-slate-400'}`}>
-              <FireIcon className={`w-12 h-12 mb-6 transition-colors ${activePersona === 'sam' ? 'text-orange-600' : 'text-slate-400'}`} />
-              <h4 className="text-2xl font-black tracking-tight mb-2">SAM</h4>
-              <p className="text-sm font-bold opacity-60">Emergency Dispatch. Handles gas smells & 4h responses.</p>
-              {activePersona === 'sam' && <div className="absolute top-6 right-6 w-3 h-3 bg-orange-600 rounded-full animate-ping"></div>}
-            </button>
-          </div>
-
-          <div id="leads" className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[3.5rem] p-12 shadow-2xl overflow-hidden relative">
-            <div className="flex justify-between items-center mb-10">
-                <h4 className="text-xl font-black tracking-widest uppercase italic">Live Lead Feed</h4>
-                <div className="px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
-                    <span className="text-[10px] font-black text-green-500 uppercase">Real-time Stream</span>
+          {/* Web3 Sidebar / Orbital Bento */}
+          <div className="lg:col-span-1 space-y-10">
+            <div className="bg-sky-600 rounded-[4rem] p-12 text-white shadow-3xl overflow-hidden relative group">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                <h4 className="text-2xl font-black uppercase tracking-tighter italic mb-4">NFT Fleet Badging</h4>
+                <p className="text-sm font-bold italic opacity-80 leading-snug mb-8">ServiceVoice verified fleets receive a non-transferable NFT badge for consumer trust.</p>
+                <div className="w-32 h-32 bg-white/10 rounded-[2.5rem] border border-white/20 flex items-center justify-center mx-auto transition-transform group-hover:scale-110 group-hover:rotate-12">
+                    <IdentificationIcon className="w-16 h-16" />
                 </div>
             </div>
             
-            {leads.length === 0 ? (
-                <div className="py-20 text-center opacity-30 flex flex-col items-center gap-4">
-                    <ChartBarIcon className="w-12 h-12" />
-                    <p className="text-sm font-black uppercase tracking-widest">Awaiting Voice Conversion</p>
-                </div>
-            ) : (
-                <div className="space-y-6">
-                    {leads.map((lead, idx) => (
-                        <div key={idx} className="flex items-center gap-6 p-6 bg-slate-100 dark:bg-white/5 rounded-3xl animate-in slide-in-from-bottom-4 duration-500">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${lead.persona === 'sam' ? 'bg-orange-500' : 'bg-sky-500'}`}>
-                                {lead.persona === 'sam' ? <ExclamationTriangleIcon className="w-6 h-6 text-white" /> : <UserIcon className="w-6 h-6 text-white" />}
-                            </div>
-                            <div className="flex-1">
-                                <div className="flex justify-between"><p className="font-black text-lg leading-none">{lead.name}</p><span className="text-[10px] opacity-40 font-bold">{lead.timestamp}</span></div>
-                                <p className="text-xs font-bold opacity-60 mt-2 truncate max-w-[200px]">{lead.summary}</p>
-                            </div>
-                            <div className="text-right"><p className="text-[10px] font-black uppercase tracking-widest text-sky-600">Dispatched</p></div>
-                        </div>
-                    ))}
-                </div>
-            )}
+            <BlockchainLedger leads={leads} />
           </div>
-        </div>
 
-        <div className="lg:sticky lg:top-32">
-            <FuturisticOrb isActive={isVoiceActive} mode={activePersona} status={voiceStatus} />
         </div>
       </section>
 
-      {/* Infrastructure Section */}
-      <section className="py-32 px-8 bg-white dark:bg-slate-950/40">
-        <div className="max-w-7xl mx-auto space-y-24 text-center">
-            <div className="max-w-3xl mx-auto space-y-6">
-                <h3 className="text-5xl font-black tracking-tighter uppercase italic">Regional Intelligence</h3>
-                <p className="text-xl text-slate-500 font-bold italic">Dedicated Toronto cloud infrastructure ensures &lt;100ms response latency for your customers.</p>
+      {/* Neural Core Demo Area */}
+      <section className="py-40 px-10 bg-slate-50 dark:bg-transparent">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-20">
+            <div className="text-center space-y-6">
+                <h3 className="text-6xl font-black tracking-tighter uppercase italic">The Neural Center</h3>
+                <p className="text-2xl text-slate-500 font-bold italic">Experience <span className="text-sky-600">low-latency</span> voice synchronization.</p>
             </div>
-            <InfrastructureMap />
+            <NeuralOrb isActive={isVoiceActive} mode={activePersona} status={voiceStatus} />
         </div>
       </section>
 
-      {/* Deployment Form */}
-      <section className="py-32 px-8 bg-slate-900 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-sky-600/10 blur-[150px] pointer-events-none"></div>
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
-            <div className="space-y-10">
-                <h3 className="text-6xl font-black text-white tracking-tighter uppercase italic leading-[0.9]">Claim Your <br/><span className="text-sky-500">Fleet Territory.</span></h3>
-                <p className="text-xl text-slate-400 font-bold leading-relaxed italic">ServiceVoice only partners with 3 fleets per major GTA city to maintain market dominance for our clients.</p>
+      {/* Web 3.0 Identity & Onboarding */}
+      <section className="py-40 px-10 bg-slate-900 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,rgba(2,132,199,0.1),transparent)]"></div>
+        <div className="max-w-7xl mx-auto grid xl:grid-cols-2 gap-32 items-center">
+            <div className="space-y-14">
+                <h3 className="text-7xl font-black text-white tracking-tighter italic uppercase leading-[0.85]">Onboard <br/><span className="text-sky-500">Securely.</span></h3>
+                <p className="text-2xl text-slate-400 font-bold italic leading-relaxed">ServiceVoice 2026 utilizes Decentralized Identity (DID) to verify fleet owners and protect sensitive customer data on the GTA-Mesh.</p>
                 
-                <div className="space-y-6">
-                    {[
-                        "Toronto Central / North York",
-                        "Mississauga / Oakville",
-                        "Brampton / Vaughan",
-                        "Scarborough / Markham"
-                    ].map(area => (
-                        <div key={area} className="flex items-center gap-4 text-white/60">
-                            <CheckCircleIcon className="w-6 h-6 text-sky-500" />
-                            <span className="font-black text-sm uppercase tracking-widest">{area} Status: Limited</span>
+                <div className="space-y-8">
+                    <div className="flex items-center gap-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5">
+                        <LockClosedIcon className="w-10 h-10 text-sky-500" />
+                        <div>
+                            <p className="text-white font-black uppercase tracking-widest text-lg italic">Self-Sovereign Data</p>
+                            <p className="text-slate-500 text-sm font-bold italic">You own your lead data. We just process it.</p>
                         </div>
-                    ))}
+                    </div>
+                    <div className="flex items-center gap-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5">
+                        <IdentificationIcon className="w-10 h-10 text-sky-500" />
+                        <div>
+                            <p className="text-white font-black uppercase tracking-widest text-lg italic">Verified Reputation</p>
+                            <p className="text-slate-500 text-sm font-bold italic">Consumer trust built on immutable reviews.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="glass-card rounded-[3.5rem] p-12 md:p-16 border-white/10 shadow-3xl relative z-10">
+            <div className="bg-white dark:bg-[#0f172a] rounded-[5rem] p-16 shadow-4xl border border-slate-200 dark:border-white/5 relative z-10">
                 {isFormSubmitted ? (
-                    <div className="text-center space-y-8 animate-in zoom-in duration-500">
-                        <div className="w-24 h-24 bg-green-500 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl rotate-12">
-                            <CheckIcon className="w-12 h-12 text-white" />
+                    <div className="text-center space-y-10 animate-in zoom-in duration-700">
+                        <div className="w-28 h-28 bg-green-500 rounded-[3rem] flex items-center justify-center mx-auto shadow-3xl rotate-12">
+                            <CheckIcon className="w-14 h-14 text-white" />
                         </div>
-                        <h4 className="text-3xl font-black text-white uppercase italic">Onboarding Locked</h4>
-                        <p className="text-slate-400 font-bold italic">A Senior Growth Partner will call your dispatch line within 60 minutes.</p>
+                        <h4 className="text-4xl font-black text-slate-900 dark:text-white uppercase italic">Node Created</h4>
+                        <p className="text-slate-500 font-bold italic">Your fleet identity is being minted. <br/>A strategist will call you shortly.</p>
                     </div>
                 ) : (
-                    <form onSubmit={handleDemoSubmit} className="space-y-8">
-                        <div className="space-y-3">
-                            <label className="text-[11px] font-black uppercase tracking-[0.3em] text-sky-500">Fleet Owner Name</label>
-                            <input required type="text" placeholder="e.g. Michael Rossi" value={demoForm.name} onChange={e => setDemoForm({...demoForm, name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 px-8 text-white focus:outline-none focus:border-sky-500 transition-all font-bold" />
+                    <form onSubmit={handleFormSubmit} className="space-y-10">
+                        {!isDidVerified ? (
+                            <button type="button" onClick={handleDidConnect} disabled={isDidConnecting} className="w-full bg-slate-100 dark:bg-white/5 py-10 rounded-[2.5rem] border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center gap-4 group hover:border-sky-500/50 transition-all">
+                                {isDidConnecting ? <ArrowPathIcon className="w-10 h-10 text-sky-500 animate-spin" /> : <IdentificationIcon className="w-12 h-12 text-slate-400 group-hover:text-sky-500 transition-colors" />}
+                                <div className="text-center">
+                                    <p className="font-black text-lg uppercase italic text-slate-900 dark:text-white">{isDidConnecting ? 'Verifying Identity...' : 'Connect Fleet DID'}</p>
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Web 3.0 Verification Required</p>
+                                </div>
+                            </button>
+                        ) : (
+                            <div className="p-6 bg-green-500/10 border border-green-500/30 rounded-3xl flex items-center gap-4">
+                                <ShieldCheckIcon className="w-8 h-8 text-green-500" />
+                                <div className="flex-1 overflow-hidden">
+                                    <p className="text-[10px] font-black text-green-500 uppercase tracking-widest">Verified Identity</p>
+                                    <p className="text-[11px] font-mono text-slate-500 truncate">{MOCK_DID}</p>
+                                </div>
+                                <CheckCircleIcon className="w-6 h-6 text-green-500" />
+                            </div>
+                        )}
+
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-black text-sky-600 uppercase tracking-[0.3em] ml-4">Fleet Principal Name</label>
+                                <input required type="text" placeholder="John Doe" value={demoForm.name} onChange={e => setDemoForm({...demoForm, name: e.target.value})} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl py-7 px-10 focus:outline-none focus:border-sky-500 transition-all font-bold text-lg" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-black text-sky-600 uppercase tracking-[0.3em] ml-4">Company (Legal Entity)</label>
+                                <input required type="text" placeholder="HVAC GTA Pros Inc." value={demoForm.company} onChange={e => setDemoForm({...demoForm, company: e.target.value})} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl py-7 px-10 focus:outline-none focus:border-sky-500 transition-all font-bold text-lg" />
+                            </div>
                         </div>
-                        <div className="space-y-3">
-                            <label className="text-[11px] font-black uppercase tracking-[0.3em] text-sky-500">HVAC Company Name</label>
-                            <input required type="text" placeholder="e.g. North York Comfort" value={demoForm.company} onChange={e => setDemoForm({...demoForm, company: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 px-8 text-white focus:outline-none focus:border-sky-500 transition-all font-bold" />
-                        </div>
-                        <div className="space-y-3">
-                            <label className="text-[11px] font-black uppercase tracking-[0.3em] text-sky-500">GTA Dispatch Phone</label>
-                            <input required type="tel" placeholder="(416) 000-0000" value={demoForm.phone} onChange={e => setDemoForm({...demoForm, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 px-8 text-white focus:outline-none focus:border-sky-500 transition-all font-bold" />
-                        </div>
-                        <button type="submit" disabled={isFormSubmitting} className="w-full bg-sky-600 py-7 rounded-[2rem] font-black text-xl uppercase tracking-widest text-white shadow-2xl hover:bg-sky-500 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50">
-                            {isFormSubmitting ? <ArrowPathIcon className="w-8 h-8 animate-spin" /> : <>DEPOSIT FLEET LOCK <ArrowRightIcon className="w-6 h-6" /></>}
+
+                        <button type="submit" disabled={isFormSubmitting || !isDidVerified} className="w-full bg-sky-600 py-8 rounded-[2.5rem] font-black text-2xl uppercase tracking-widest text-white shadow-3xl hover:bg-sky-500 transition-all flex items-center justify-center gap-6 active:scale-95 disabled:opacity-40">
+                            {isFormSubmitting ? <ArrowPathIcon className="w-10 h-10 animate-spin" /> : <>DEPOSIT FLEET LOCK <ArrowRightIcon className="w-8 h-8" /></>}
                         </button>
                     </form>
                 )}
@@ -547,61 +591,76 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* 2026 Footer */}
-      <footer className="py-24 px-8 border-t border-slate-200 dark:border-white/5 text-center">
-        <div className="max-w-7xl mx-auto opacity-40 hover:opacity-100 transition-opacity">
-            <p className="text-[12px] font-black uppercase tracking-[1em] mb-4">© 2026 ServiceVoice Technologies Inc.</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest italic">Encrypted GTA Infrastructure • Node Toronto-101 • Distributed Ledger Verified</p>
+      {/* 2026 Footer Infrastructure */}
+      <footer className="py-32 px-10 text-center border-t border-slate-200 dark:border-white/5 bg-white dark:bg-[#020617]">
+        <div className="max-w-7xl mx-auto space-y-12">
+            <div className="flex justify-center gap-10">
+                <GlobeAltIcon className="w-8 h-8 opacity-20" />
+                <CubeIcon className="w-8 h-8 opacity-20" />
+                <CpuChipIcon className="w-8 h-8 opacity-20" />
+            </div>
+            <p className="text-[13px] font-black uppercase tracking-[1em] text-slate-300 dark:text-white/10">© 2026 ServiceVoice Technologies GTA</p>
+            <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest italic">
+                <span>Decentralized Identity Verified</span>
+                <span>Node: TOR-CENTRAL-416</span>
+                <span>IPFS Secure Logs</span>
+                <span>Smart Contract Audited v2.4</span>
+            </div>
         </div>
       </footer>
 
-      {/* Conversational Support Hub */}
-      <div className="fixed bottom-12 right-12 z-[200] flex flex-col items-end gap-6">
+      {/* Floating Support Hub */}
+      <div className="fixed bottom-12 right-12 z-[200] flex flex-col items-end gap-8">
         {isChatOpen && (
-            <div className="w-[420px] h-[650px] bg-white dark:bg-slate-900 rounded-[3.5rem] shadow-4xl border border-slate-200 dark:border-white/10 flex flex-col overflow-hidden animate-in slide-in-from-bottom-12 duration-500">
-                <div className={`p-8 text-white flex justify-between items-center transition-colors duration-700 ${!chatType ? 'bg-slate-900' : 'bg-sky-600'}`}>
+            <div className="w-[450px] h-[700px] bg-white dark:bg-[#0f172a] rounded-[4.5rem] shadow-5xl border border-slate-200 dark:border-white/10 flex flex-col overflow-hidden animate-in slide-in-from-bottom-12 duration-500">
+                <div className={`p-10 text-white flex justify-between items-center transition-colors duration-700 ${!chatTopic ? 'bg-slate-900' : 'bg-sky-600 shadow-[0_15px_30px_rgba(2,132,199,0.3)]'}`}>
                     <div>
-                        <h5 className="text-xl font-black tracking-tighter uppercase italic">{!chatType ? 'System Support' : 'Growth Strategist'}</h5>
-                        <div className="flex items-center gap-2 mt-1">
-                            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-80">AI Protocol Active</span>
+                        <h5 className="text-2xl font-black tracking-tighter uppercase italic">{!chatTopic ? 'Strategy Hub' : 'SaaS Strategist'}</h5>
+                        <div className="flex items-center gap-3 mt-2">
+                            <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse"></div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">Sync Protocol Active</span>
                         </div>
                     </div>
-                    <button onClick={() => setIsChatOpen(false)} className="p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all"><XMarkIcon className="w-6 h-6" /></button>
+                    <button onClick={() => setIsChatOpen(false)} className="p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all active:scale-90"><XMarkIcon className="w-8 h-8" /></button>
                 </div>
 
-                {!chatType ? (
-                    <div className="flex-1 p-10 flex flex-col justify-center gap-8">
-                        <button onClick={() => setChatType('growth')} className="group bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/5 p-8 rounded-[2.5rem] text-left transition-all hover:border-sky-500 hover:scale-105">
-                            <ChartBarIcon className="w-10 h-10 text-sky-600 mb-4" />
-                            <h6 className="font-black text-lg uppercase tracking-tight italic">Fleet Growth</h6>
-                            <p className="text-xs font-bold opacity-60">Revenue & ROI analysis.</p>
+                {!chatTopic ? (
+                    <div className="flex-1 p-12 flex flex-col justify-center gap-10">
+                        <button onClick={() => setChatTopic('growth')} className="group bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 p-10 rounded-[3.5rem] text-left transition-all hover:border-sky-500 hover:scale-105 active:scale-95">
+                            <ChartBarIcon className="w-12 h-12 text-sky-600 mb-6" />
+                            <h6 className="font-black text-xl uppercase tracking-tighter italic text-slate-900 dark:text-white">Revenue ROI</h6>
+                            <p className="text-xs font-bold opacity-60 leading-relaxed italic">Optimize lead conversion and Enbridge pre-qual funnels.</p>
                         </button>
-                        <button onClick={() => setChatType('ops')} className="group bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/5 p-8 rounded-[2.5rem] text-left transition-all hover:border-orange-500 hover:scale-105">
-                            <CpuChipIcon className="w-10 h-10 text-orange-600 mb-4" />
-                            <h6 className="font-black text-lg uppercase tracking-tight italic">Operations Sync</h6>
-                            <p className="text-xs font-bold opacity-60">Jobber/ServiceTitan Logic.</p>
+                        <button onClick={() => setChatTopic('web3')} className="group bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 p-10 rounded-[3.5rem] text-left transition-all hover:border-orange-500 hover:scale-105 active:scale-95">
+                            <IdentificationIcon className="w-12 h-12 text-orange-600 mb-6" />
+                            <h6 className="font-black text-xl uppercase tracking-tighter italic text-slate-900 dark:text-white">Web 3.0 Logic</h6>
+                            <p className="text-xs font-bold opacity-60 leading-relaxed italic">Managing your Fleet DID and blockchain reputation nodes.</p>
                         </button>
                     </div>
                 ) : (
                     <>
-                        <div className="flex-1 p-8 overflow-y-auto space-y-6 bg-slate-50/50 dark:bg-slate-950/20">
+                        <div className="flex-1 p-10 overflow-y-auto space-y-8 bg-slate-50/50 dark:bg-slate-950/20">
+                            <div className="flex justify-start">
+                                <div className="max-w-[85%] p-8 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-[2.5rem] rounded-tl-none border border-slate-100 dark:border-white/5 text-sm font-bold shadow-xl italic">
+                                    Protocol synchronized. How can I assist with your {chatTopic === 'growth' ? 'Revenue ROI' : 'Web 3.0 Fleet Identity'} today?
+                                </div>
+                            </div>
                             {messages.map((m, i) => (
                                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[85%] p-6 rounded-[2rem] text-sm font-bold shadow-xl ${m.role === 'user' ? 'bg-sky-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-none border border-slate-100 dark:border-white/5'}`}>{m.text}</div>
+                                    <div className={`max-w-[85%] p-8 rounded-[2.5rem] text-sm font-bold shadow-2xl ${m.role === 'user' ? 'bg-sky-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-none border border-slate-100 dark:border-white/5'} italic`}>{m.text}</div>
                                 </div>
                             ))}
                         </div>
-                        <form onSubmit={handleChat} className="p-8 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-slate-900 flex gap-4">
-                            <input type="text" placeholder="Describe your fleet goal..." value={chatInput} onChange={e => setChatInput(e.target.value)} className="flex-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-5 text-sm font-bold focus:outline-none italic" />
-                            <button type="submit" className="bg-sky-600 text-white p-5 rounded-2xl shadow-xl hover:bg-sky-500 active:scale-95 transition-all"><PaperAirplaneIcon className="w-6 h-6" /></button>
+                        <form onSubmit={handleChatMsg} className="p-10 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-slate-900 flex gap-6">
+                            <input type="text" placeholder="Message strategist..." value={chatInput} onChange={e => setChatInput(e.target.value)} className="flex-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl px-8 py-6 text-sm font-bold focus:outline-none italic" />
+                            <button type="submit" className="bg-sky-600 text-white p-6 rounded-3xl shadow-3xl hover:bg-sky-500 active:scale-90 transition-all"><PaperAirplaneIcon className="w-7 h-7" /></button>
                         </form>
                     </>
                 )}
             </div>
         )}
-        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center shadow-4xl transition-all duration-500 hover:scale-110 active:scale-90 ${isChatOpen ? 'bg-white text-slate-900 rotate-90' : 'bg-sky-600 text-white shadow-sky-500/40'}`}>
-            {isChatOpen ? <XMarkIcon className="w-10 h-10" /> : <ChatBubbleLeftRightIcon className="w-10 h-10" />}
+        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center shadow-5xl transition-all duration-700 hover:scale-110 active:scale-90 ${isChatOpen ? 'bg-white text-slate-900 rotate-90 scale-105' : 'bg-sky-600 text-white shadow-sky-500/50'}`}>
+            {isChatOpen ? <XMarkIcon className="w-14 h-14" /> : <ChatBubbleLeftRightIcon className="w-14 h-14" />}
         </button>
       </div>
 
