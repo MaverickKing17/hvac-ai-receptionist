@@ -26,7 +26,9 @@ import {
   ArrowRightIcon,
   MapPinIcon,
   ChatBubbleLeftRightIcon,
-  PaperAirplaneIcon
+  PaperAirplaneIcon,
+  BanknotesIcon,
+  LifebuoyIcon
 } from '@heroicons/react/24/solid';
 
 // --- Audio Helpers ---
@@ -114,10 +116,9 @@ const App: React.FC = () => {
 
   // Chat Widget State
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatPersona, setChatPersona] = useState<'sales' | 'support' | null>(null);
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'agent'; text: string }[]>([
-    { role: 'agent', text: 'Hi! I\'m your ServiceVoice specialist. How can I help you scale your GTA HVAC brand today?' }
-  ]);
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'agent'; text: string }[]>([]);
   const [isAgentTyping, setIsAgentTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -134,7 +135,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+  }, [chatMessages, isChatOpen]);
 
   const handleDemoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,9 +147,22 @@ const App: React.FC = () => {
     }, 1200);
   };
 
+  const selectPersona = (persona: 'sales' | 'support') => {
+    setChatPersona(persona);
+    const greeting = persona === 'sales' 
+      ? "Hey there! I'm the ServiceVoice Growth Specialist. Ready to see how we can skyrocket your GTA install volume?"
+      : "Hello! I'm your ServiceVoice Integration Specialist. How can I help you with platform features or technical setup today?";
+    setChatMessages([{ role: 'agent', text: greeting }]);
+  };
+
+  const resetChat = () => {
+    setChatPersona(null);
+    setChatMessages([]);
+  };
+
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || !chatPersona) return;
 
     const userMsg = chatInput;
     setChatInput('');
@@ -157,11 +171,16 @@ const App: React.FC = () => {
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      
+      const salesInstruction = `You are a ServiceVoice Sales Strategist. Your goal is to convince HVAC contractors in the Toronto/GTA area to adopt the ServiceVoice platform. Focus on ROI, increased lead conversion, Enbridge/HRS rebate capture, and the 24/7 reliability of AI dispatch. You are persuasive, energetic, and highly focused on business growth.`;
+      
+      const supportInstruction = `You are a ServiceVoice Support Specialist. Your goal is to help users understand how the platform works. Focus on integrations (Jobber, ServiceTitan), AI persona configuration (Chloe vs Sam), technical requirements, and setup steps. You are helpful, detail-oriented, patient, and knowledgeable about the technical specs.`;
+
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [...chatMessages.map(m => (m.role === 'user' ? 'User: ' + m.text : 'Agent: ' + m.text)), 'User: ' + userMsg].join('\n'),
         config: {
-          systemInstruction: 'You are a ServiceVoice Support Specialist. Your goal is to help HVAC contractors understand the benefits of the ServiceVoice white-label AI platform. You are professional, tech-savvy, and knowledgeable about the Toronto/GTA market. Keep responses concise and helpful.',
+          systemInstruction: chatPersona === 'sales' ? salesInstruction : supportInstruction,
         }
       });
 
@@ -539,64 +558,112 @@ const App: React.FC = () => {
         {isChatOpen && (
           <div className="mb-6 w-[360px] md:w-[420px] h-[550px] bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300">
             {/* Header */}
-            <div className="bg-sky-600 p-6 text-white flex justify-between items-center">
+            <div className={`p-6 text-white flex justify-between items-center transition-colors duration-500 ${!chatPersona ? 'bg-slate-800' : chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600'}`}>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <ChatBubbleLeftRightIcon className="w-6 h-6" />
+                  {!chatPersona ? <ChatBubbleLeftRightIcon className="w-6 h-6" /> : chatPersona === 'sales' ? <BanknotesIcon className="w-6 h-6" /> : <LifebuoyIcon className="w-6 h-6" />}
                 </div>
                 <div>
-                  <h5 className="text-base font-bold tracking-tight">Support Specialist</h5>
+                  <h5 className="text-base font-bold tracking-tight">
+                    {!chatPersona ? 'Choose Your AI Guide' : chatPersona === 'sales' ? 'Sales Strategist' : 'Support Specialist'}
+                  </h5>
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-90">Online Now</span>
+                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-90">Ready to assist</span>
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsChatOpen(false)} className="p-2.5 hover:bg-black/10 rounded-xl transition-all">
-                <XMarkIcon className="w-6 h-6" />
-              </button>
+              <div className="flex gap-1">
+                {chatPersona && (
+                  <button onClick={resetChat} title="Change Persona" className="p-2 hover:bg-black/10 rounded-xl transition-all">
+                    <RectangleGroupIcon className="w-5 h-5" />
+                  </button>
+                )}
+                <button onClick={() => setIsChatOpen(false)} className="p-2.5 hover:bg-black/10 rounded-xl transition-all">
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 p-6 overflow-y-auto space-y-5">
-              {chatMessages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] p-5 rounded-3xl text-sm font-semibold leading-relaxed ${msg.role === 'user' ? 'bg-sky-600 text-white rounded-tr-none shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none shadow-sm'}`}>
-                    {msg.text}
-                  </div>
+            {/* Content Area */}
+            {!chatPersona ? (
+              <div className="flex-1 p-8 flex flex-col justify-center gap-6 animate-in fade-in zoom-in duration-500">
+                <div className="text-center space-y-2 mb-4">
+                   <h6 className="text-lg font-bold text-slate-800 dark:text-white">How can we help today?</h6>
+                   <p className="text-sm font-medium text-slate-500">Select a specialist to start chatting.</p>
                 </div>
-              ))}
-              {isAgentTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-slate-100 dark:bg-slate-800 p-5 rounded-3xl rounded-tl-none flex gap-1.5 items-center">
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></div>
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></div>
+                <button 
+                  onClick={() => selectPersona('sales')}
+                  className="group relative overflow-hidden bg-orange-50 dark:bg-orange-900/10 border-2 border-orange-200 dark:border-orange-800/30 p-6 rounded-3xl flex items-center gap-5 hover:border-orange-500 transition-all text-left"
+                >
+                  <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <BanknotesIcon className="w-7 h-7 text-white" />
                   </div>
+                  <div>
+                    <h6 className="font-bold text-orange-900 dark:text-orange-400">Growth & Sales</h6>
+                    <p className="text-[13px] font-semibold text-orange-700/60 dark:text-orange-500/60">ROI, Lead Gen, & Market Dominance</p>
+                  </div>
+                </button>
+                <button 
+                   onClick={() => selectPersona('support')}
+                   className="group relative overflow-hidden bg-sky-50 dark:bg-sky-900/10 border-2 border-sky-200 dark:border-sky-800/30 p-6 rounded-3xl flex items-center gap-5 hover:border-sky-500 transition-all text-left"
+                >
+                  <div className="w-14 h-14 bg-sky-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <LifebuoyIcon className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h6 className="font-bold text-sky-900 dark:text-sky-400">Technical Support</h6>
+                    <p className="text-[13px] font-semibold text-sky-700/60 dark:text-sky-500/60">Features, Integrations, & Setup</p>
+                  </div>
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Messages */}
+                <div className="flex-1 p-6 overflow-y-auto space-y-5 bg-slate-50/50 dark:bg-slate-950/20">
+                  {chatMessages.map((msg, i) => (
+                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] p-5 rounded-3xl text-sm font-semibold leading-relaxed shadow-sm ${msg.role === 'user' ? (chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600') + ' text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none border border-slate-100 dark:border-slate-800'}`}>
+                        {msg.text}
+                      </div>
+                    </div>
+                  ))}
+                  {isAgentTyping && (
+                    <div className="flex justify-start">
+                      <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl rounded-tl-none border border-slate-100 dark:border-slate-800 flex gap-1.5 items-center">
+                        <div className={`w-2 h-2 rounded-full animate-bounce ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div>
+                        <div className={`w-2 h-2 rounded-full animate-bounce delay-75 ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div>
+                        <div className={`w-2 h-2 rounded-full animate-bounce delay-150 ${chatPersona === 'sales' ? 'bg-orange-400' : 'bg-sky-400'}`}></div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={chatEndRef} />
                 </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
 
-            {/* Input */}
-            <form onSubmit={handleChatSubmit} className="p-5 border-t border-slate-100 dark:border-slate-800 flex gap-3">
-              <input 
-                type="text" 
-                placeholder="Type your question..."
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-[15px] font-semibold focus:outline-none focus:border-sky-500"
-              />
-              <button type="submit" className="p-3.5 bg-sky-600 text-white rounded-2xl hover:bg-sky-500 transition-all shadow-md active:scale-95">
-                <PaperAirplaneIcon className="w-6 h-6" />
-              </button>
-            </form>
+                {/* Input */}
+                <form onSubmit={handleChatSubmit} className="p-5 border-t border-slate-100 dark:border-slate-800 flex gap-3 bg-white dark:bg-slate-900">
+                  <input 
+                    type="text" 
+                    placeholder="Type your question..."
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-[15px] font-semibold focus:outline-none focus:border-slate-400 dark:focus:border-slate-600"
+                  />
+                  <button 
+                    type="submit" 
+                    className={`p-3.5 text-white rounded-2xl transition-all shadow-md active:scale-95 ${chatPersona === 'sales' ? 'bg-orange-600 hover:bg-orange-500' : 'bg-sky-600 hover:bg-sky-500'}`}
+                  >
+                    <PaperAirplaneIcon className="w-6 h-6" />
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         )}
 
         <button 
           onClick={() => setIsChatOpen(!isChatOpen)}
-          className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${isChatOpen ? 'bg-white dark:bg-slate-800 text-sky-600' : 'bg-sky-600 text-white'}`}
+          className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${isChatOpen ? 'bg-white dark:bg-slate-800 text-slate-800' : 'bg-sky-600 text-white'}`}
         >
           {isChatOpen ? <XMarkIcon className="w-8 h-8" /> : <ChatBubbleLeftRightIcon className="w-8 h-8" />}
         </button>
