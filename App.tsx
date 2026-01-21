@@ -169,6 +169,7 @@ const App: React.FC = () => {
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'agent'; text: string }[]>([]);
   const [isAgentTyping, setIsAgentTyping] = useState(false);
+  const [isAgentOnline, setIsAgentOnline] = useState(true); // Agent availability simulation
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -438,8 +439,19 @@ const App: React.FC = () => {
       <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
         {isChatOpen && (
           <div className="mb-6 w-[360px] md:w-[420px] h-[550px] bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-bottom-8">
-            <div className={`p-6 text-white flex justify-between items-center ${!chatPersona ? 'bg-slate-800' : chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600'}`}>
-              <div className="flex items-center gap-4"><div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-black">AI</div><div><h5 className="text-base font-black tracking-tighter uppercase">{!chatPersona ? 'Select Specialist' : chatPersona + ' Strategist'}</h5><div className="flex items-center gap-2"><div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div><span className="text-[10px] font-black uppercase tracking-widest">Online</span></div></div></div>
+            <div className={`p-6 text-white flex justify-between items-center transition-colors duration-500 ${!chatPersona ? 'bg-slate-800' : chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600'}`}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-black">AI</div>
+                <div>
+                  <h5 className="text-base font-black tracking-tighter uppercase">{!chatPersona ? 'Select Specialist' : chatPersona + ' Strategist'}</h5>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full transition-all duration-300 ${isAgentOnline ? 'bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-slate-400'}`}></div>
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      {isAgentOnline ? 'Live' : 'Offline'}
+                    </span>
+                  </div>
+                </div>
+              </div>
               <button onClick={() => setIsChatOpen(false)} className="p-2 hover:bg-black/10 rounded-xl transition-all"><XMarkIcon className="w-6 h-6" /></button>
             </div>
             {!chatPersona ? (
@@ -455,11 +467,11 @@ const App: React.FC = () => {
                       <div className={`max-w-[85%] p-5 rounded-[2rem] text-sm font-bold shadow-sm ${msg.role === 'user' ? (chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600') + ' text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none border border-slate-100 dark:border-slate-800'}`}>{msg.text}</div>
                     </div>
                   ))}
-                  {isAgentTyping && <div className="flex justify-start"><div className="bg-white p-5 rounded-3xl flex gap-1.5 items-center"><div className="w-2 h-2 rounded-full animate-bounce bg-sky-400"></div><div className="w-2 h-2 rounded-full animate-bounce delay-75 bg-sky-400"></div></div></div>}
+                  {isAgentTyping && <div className="flex justify-start"><div className="bg-white dark:bg-slate-800 p-5 rounded-3xl flex gap-1.5 items-center"><div className="w-2 h-2 rounded-full animate-bounce bg-sky-400"></div><div className="w-2 h-2 rounded-full animate-bounce delay-75 bg-sky-400"></div><div className="w-2 h-2 rounded-full animate-bounce delay-150 bg-sky-400"></div></div></div>}
                   <div ref={chatEndRef} />
                 </div>
-                <form onSubmit={handleChatSubmit} className="p-6 border-t border-slate-100 flex gap-4 bg-white dark:bg-slate-900">
-                  <input type="text" placeholder="Type a message..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-[15px] font-bold focus:outline-none" />
+                <form onSubmit={handleChatSubmit} className="p-6 border-t border-slate-100 dark:border-slate-800 flex gap-4 bg-white dark:bg-slate-900">
+                  <input type="text" placeholder="Type a message..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-[15px] font-bold focus:outline-none" />
                   <button type="submit" className={`p-4 text-white rounded-2xl shadow-xl transition-all ${chatPersona === 'sales' ? 'bg-orange-600' : 'bg-sky-600'}`}><PaperAirplaneIcon className="w-6 h-6" /></button>
                 </form>
               </>
