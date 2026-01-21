@@ -4,111 +4,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peel AI Receptionist | White-Label HVAC SaaS 2026</title>
+    <title>ServiceVoice GTA | White-Label HVAC AI 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #1E40AF;
-            --secondary-color: #F97316;
-            --accent-color: #0D9488;
-            --font-heading: 'Inter', sans-serif;
-            --font-body: 'Inter', sans-serif;
+            --primary-color: #0284c7;
+            --secondary-color: #0f172a;
+            --font-main: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
         }
 
         body {
-            font-family: var(--font-body);
+            font-family: var(--font-main);
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: var(--font-heading);
-            letter-spacing: -0.02em;
+            font-family: var(--font-main);
+            font-weight: 700;
+            letter-spacing: -0.01em;
         }
 
         .mesh-gradient {
             background: 
-                radial-gradient(at 27% 37%, hsla(215, 98%, 27%, 0.15) 0px, transparent 50%),
-                radial-gradient(at 97% 21%, hsla(32, 100%, 60%, 0.1) 0px, transparent 50%),
-                radial-gradient(at 52% 99%, hsla(205, 98%, 15%, 0.05) 0px, transparent 50%),
-                radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 0.1) 0px, transparent 50%);
+                radial-gradient(at 27% 37%, hsla(215, 98%, 27%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 97% 21%, hsla(200, 100%, 60%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 52% 99%, hsla(210, 98%, 15%, 0.05) 0px, transparent 50%);
             background-attachment: fixed;
         }
 
         .dark .mesh-gradient {
             background: 
-                radial-gradient(at 27% 37%, hsla(215, 98%, 10%, 0.4) 0px, transparent 50%),
-                radial-gradient(at 97% 21%, hsla(32, 100%, 30%, 0.2) 0px, transparent 50%),
-                radial-gradient(at 52% 99%, hsla(205, 98%, 5%, 0.6) 0px, transparent 50%);
+                radial-gradient(at 27% 37%, hsla(215, 98%, 10%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 97% 21%, hsla(200, 100%, 30%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 52% 99%, hsla(210, 98%, 5%, 0.5) 0px, transparent 50%);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px) saturate(160%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
         }
 
         .dark .glass-card {
-            background: rgba(17, 24, 39, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes orbit {
-            from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
-            to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
-        }
-
-        @keyframes pulse-ring {
-            0% { transform: scale(0.33); opacity: 1; }
-            80%, 100% { opacity: 0; transform: scale(2); }
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         @keyframes wave-dynamic {
-            0%, 100% { transform: scaleY(0.3); }
+            0%, 100% { transform: scaleY(0.4); }
             50% { transform: scaleY(1); }
         }
 
-        @keyframes ripple {
-            0% { transform: scale(1); opacity: 0.4; }
-            100% { transform: scale(2.5); opacity: 0; }
-        }
-
-        @keyframes mic-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
-            50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.8); }
-        }
-
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-orbit { animation: orbit 25s linear infinite; }
-        .animate-pulse-ring { animation: pulse-ring 3s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; }
         .animate-wave-dynamic { animation: wave-dynamic 0.8s ease-in-out infinite; }
-        .animate-ripple { animation: ripple 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        .animate-mic-glow { animation: mic-glow 2s ease-in-out infinite; }
         
-        .selection-active {
-            box-shadow: 0 0 0 2px var(--primary-color), 0 0 20px rgba(30, 64, 175, 0.4);
+        /* Custom scrollbar for professional look */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
         }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "@heroicons/react/": "https://esm.sh/@heroicons/react@^2.2.0/"
   }
 }
 </script>
 </head>
-<body class="bg-[#FDFDFD] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+<body class="bg-[#F8FAFC] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
 </body>
