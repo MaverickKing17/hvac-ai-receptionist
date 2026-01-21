@@ -28,7 +28,8 @@ import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
   BanknotesIcon,
-  LifebuoyIcon
+  LifebuoyIcon,
+  SignalIcon
 } from '@heroicons/react/24/solid';
 
 // --- Audio Helpers ---
@@ -98,6 +99,102 @@ const ProductOrb: React.FC<{ isActive: boolean; mode: 'chloe' | 'sam' }> = ({ is
           <h4 className="text-lg font-bold text-slate-800 dark:text-white">
             {isActive ? (mode === 'chloe' ? 'GTA Sales Hub' : 'GTA Dispatch Hub') : 'ServiceVoice AI'}
           </h4>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const GTAMap: React.FC = () => {
+  const [activeCity, setActiveCity] = useState<string | null>(null);
+
+  // Approximate relative coordinates for a stylized GTA map
+  const cityNodes = [
+    { id: 'Toronto', x: '50%', y: '60%' },
+    { id: 'Mississauga', x: '40%', y: '65%' },
+    { id: 'Brampton', x: '35%', y: '50%' },
+    { id: 'Vaughan', x: '45%', y: '40%' },
+    { id: 'Markham', x: '55%', y: '40%' },
+    { id: 'Oakville', x: '35%', y: '75%' },
+    { id: 'Richmond Hill', x: '50%', y: '35%' },
+    { id: 'Burlington', x: '30%', y: '80%' },
+  ];
+
+  return (
+    <div className="relative w-full h-[500px] bg-slate-100 dark:bg-slate-900/50 rounded-[3rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-inner">
+      {/* Stylized Lake Ontario Shadow */}
+      <div className="absolute bottom-0 right-0 w-[80%] h-[40%] bg-sky-500/5 blur-[80px] rounded-full pointer-events-none"></div>
+      
+      {/* Background Grid */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+
+      <div className="absolute top-10 left-10 z-10 space-y-2">
+        <h4 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Live GTA Coverage</h4>
+        <p className="text-sm font-medium text-slate-500 max-w-xs uppercase tracking-widest">Hover over cities to view AI network status across Southern Ontario.</p>
+      </div>
+
+      {/* SVG Map Container */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+        {/* Stylized Network Lines */}
+        {cityNodes.map((node, i) => (
+          cityNodes.slice(i + 1).map((target, j) => (
+            <line 
+              key={`${i}-${j}`} 
+              x1={node.x} y1={node.y} x2={target.x} y2={target.y} 
+              stroke="currentColor" strokeWidth="0.5" className="text-sky-500 dark:text-sky-400"
+            />
+          ))
+        ))}
+      </svg>
+
+      {/* Interactive Nodes */}
+      <div className="absolute inset-0">
+        {cityNodes.map((city) => (
+          <div 
+            key={city.id} 
+            className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+            style={{ left: city.x, top: city.y }}
+            onMouseEnter={() => setActiveCity(city.id)}
+            onMouseLeave={() => setActiveCity(null)}
+          >
+            {/* Ping effect */}
+            <div className="absolute inset-0 w-8 h-8 -translate-x-1/4 -translate-y-1/4 bg-sky-500/20 rounded-full animate-ping pointer-events-none"></div>
+            
+            {/* Node circle */}
+            <div className={`w-4 h-4 rounded-full border-2 transition-all duration-300 shadow-lg ${activeCity === city.id ? 'bg-sky-500 border-white scale-150' : 'bg-white dark:bg-slate-800 border-sky-500'}`}></div>
+            
+            {/* Label */}
+            <div className={`absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-xl transition-all duration-300 pointer-events-none ${activeCity === city.id ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 -translate-x-4 scale-95'}`}>
+              <div className="flex items-center gap-2">
+                <SignalIcon className="w-3 h-3 text-green-500" />
+                <span className="text-[12px] font-bold uppercase tracking-wider">{city.id}</span>
+              </div>
+              <div className="mt-1 text-[10px] font-bold text-slate-500 uppercase tracking-[0.1em]">AI Node Online</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Status Overlay */}
+      <div className="absolute bottom-10 right-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center">
+            <GlobeAltIcon className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-sky-600 uppercase tracking-widest">Network Status</div>
+            <div className="text-sm font-bold uppercase tracking-tight">Active Coverage</div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-900 dark:text-white">100%</div>
+            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">GTA Uptime</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-900 dark:text-white">8+</div>
+            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Hubs Online</div>
+          </div>
         </div>
       </div>
     </div>
@@ -413,6 +510,15 @@ const App: React.FC = () => {
                  <ServerIcon className="w-16 h-16 opacity-10" />
               </div>
             </div>
+          </div>
+
+          {/* GTA Map Section */}
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <h4 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">GTA Service Coverage</h4>
+              <p className="text-lg text-slate-500 font-medium max-w-2xl mx-auto">Providing 24/7 AI voice infrastructure to the entire Golden Horseshoe area.</p>
+            </div>
+            <GTAMap />
           </div>
         </div>
       </section>
